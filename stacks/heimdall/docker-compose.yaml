@@ -10,7 +10,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${HEIMDALL_PATH}/config:/config
+      - ${HEIMDALL_PATH}:/config
     ports:
       - 11443:443
     restart: unless-stopped
