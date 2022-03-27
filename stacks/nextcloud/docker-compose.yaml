@@ -3,7 +3,7 @@ version: '3'
 
 services:
   app:
-    image: lscr.io/linuxserver/nextcloud
+    image: lscr.io/linuxserver/nextcloud:23.0.3-ls176
     container_name: nextcloud_app
     environment:
       - PUID=${PUID}
@@ -20,7 +20,7 @@ services:
       - redis
     
   mariadb:
-    image: lscr.io/linuxserver/mariadb
+    image: lscr.io/linuxserver/mariadb:10.5.15-r0-ls51
     container_name: nextcloud_mariadb
     environment:
       - PUID=${PUID}
@@ -35,6 +35,6 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis
+    image: redis:7.0-rc-alpine
     container_name: nextcloud_redis
     restart: unless-stopped
