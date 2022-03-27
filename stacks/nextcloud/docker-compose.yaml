@@ -1,0 +1,40 @@
+---
+version: '3'
+
+services:
+  app:
+    image: lscr.io/linuxserver/nextcloud
+    container_name: nextcloud_app
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${NEXTCLOUD_PATH}/config:/config
+      - ${NEXTCLOUD_PATH}/data:/data
+    ports:
+      - 3443:443
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+    
+  mariadb:
+    image: lscr.io/linuxserver/mariadb
+    container_name: nextcloud_mariadb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_MARIADB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${NEXTCLOUD_MARIADB_PASSWORD}
+    volumes:
+      - ${NEXTCLOUD_PATH}/mariadb:/config
+    restart: unless-stopped
+
+  redis:
+    image: redis
+    container_name: nextcloud_redis
+    restart: unless-stopped
