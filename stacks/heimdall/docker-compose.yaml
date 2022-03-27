@@ -1,0 +1,16 @@
+---
+version: '3'
+
+services:
+  app:
+    image: lscr.io/linuxserver/heimdall:v2.4.8-ls165
+    container_name: heimdall_app
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${HEIMDALL_PATH}/config:/config
+    ports:
+      - 11443:443
+    restart: unless-stopped
