@@ -1,0 +1,45 @@
+version: '3.3'
+
+services:
+  app:
+    image: fireflyiii/core:version-5.6.16
+    container_name: firefly_app
+    environment:
+      - SITE_OWNER=${FIREFLY_SITE_OWNER}
+      - APP_KEY=${FIREFLY_APP_KEY}
+      - TZ=${FIREFLY_TZ}
+      - DB_CONNECTION=mysql
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_DATABASE=${FIREFLY_MARIADB_DATABASE}
+      - DB_USERNAME=${FIREFLY_MARIADB_USER}
+      - DB_PASSWORD=${FIREFLY_MARIADB_PASSWORD}
+      - REDIS_HOST=redis
+    volumes:
+      - ${FIREFLY_PATH}/app:/var/www/html/storage/upload
+    ports:
+      - 11080:8080
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+
+  mariadb:
+    image: lscr.io/linuxserver/mariadb:10.5.15-r0-ls51
+    container_name: firefly_mariadb    
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${FIREFLY_TZ}
+      - MYSQL_ROOT_PASSWORD=${FIREFLY_MARIADB_PASSWORD}
+      - MYSQL_USER=${FIREFLY_MARIADB_USER}
+      - MYSQL_PASSWORD=${FIREFLY_MARIADB_PASSWORD}
+      - MYSQL_DATABASE=${FIREFLY_MARIADB_DATABASE}
+    volumes:
+      - ${FIREFLY_PATH}/mariadb:/config
+    restart: unless-stopped
+
+    redis:
+      image: redis:7.0-rc-alpine
+      container_name: firefly_redis
+      restart: unless-stopped
