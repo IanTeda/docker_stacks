@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+    kopia:
+        image: kopia/kopia:latest
+        container_name: kopia_app
+        hostname: ${KOPIA_HOSTNAME}
+        user: "${PUID}:${PGID}"
+        restart: unless-stopped
+        ports:
+            - 51515:51515
+        environment:
+            KOPIA_PASSWORD: ${KOPIA_PASSWORD}
+            TZ: ${KOPIA_TZ}
+        volumes:
+            - ${KOPIA_PATH}/config:/app/config
+            - ${KOPIA_PATH}/cache:/app/cache
+            - ${KOPIA_PATH}/rclone:/app/rclone
+            - ${KOPIA_PATH}/logs:/app/logs
+        entrypoint: ["/app/kopia", "server", "--insecure", "--address=0.0.0.0:51515", "--override-username=${KOPIA_USERNAME}", "--server-username=${KOPIA_USERNAME}", "--server-password=${KOPIA_PASSWORD}"]
