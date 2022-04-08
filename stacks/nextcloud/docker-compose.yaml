@@ -3,7 +3,7 @@ version: '3'
 
 services:
   app:
-    image: lscr.io/linuxserver/nextcloud:23.0.3-ls176
+    image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_VERSION:23.0.3-ls176}
     container_name: nextcloud_app
     environment:
       - PUID=${PUID}
@@ -14,13 +14,15 @@ services:
       - ${NEXTCLOUD_PATH}/data:/data
     ports:
       - 3443:443
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     depends_on:
       - mariadb
       - redis
     
   mariadb:
-    image: lscr.io/linuxserver/mariadb:10.5.15-r0-ls51
+    image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:10.5.15-r0-ls51}
     container_name: nextcloud_mariadb
     environment:
       - PUID=${PUID}
@@ -32,9 +34,15 @@ services:
       - MYSQL_PASSWORD=${NEXTCLOUD_MARIADB_PASSWORD}
     volumes:
       - ${NEXTCLOUD_PATH}/mariadb:/config
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
 
   redis:
-    image: redis:7.0-rc-alpine
+    image: redis:${REDIS_VERSION:7.0-rc-alpine}
     container_name: nextcloud_redis
+    volumes:
+      - ${NEXTCLOUD_PATH}/redis:/data
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
