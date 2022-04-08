@@ -1,6 +1,6 @@
 # Nextcloud Docker Compose
 
-Environmental variables need to be set in `.env`. An example config can be found at env.example.
+Environmental variables need to be set in `.env`. An example config can be found at `env.example`.
 
 ## Redis
 
