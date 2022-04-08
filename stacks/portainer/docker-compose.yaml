@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  portainer:
+    image: portainer/portainer-ce:2.11.1
+    container_name: portainer_app
+    # entrypoint:
+    #   - /portainer
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PORTAINER_PATH}:/data
+    ipc: shareable
+    # logging:
+    #   driver: db
+    #   options: {}
+    # mac_address: 02:42:ac:11:00:0b
+    # networks:
+    #   - bridge
+    ports:
+      - 8000:8000/tcp
+      - 9443:9443/tcp
+    restart: always
+
+#     working_dir: /
+# networks:
+#   bridge:
+#     external: true
