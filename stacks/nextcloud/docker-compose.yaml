@@ -43,8 +43,8 @@ services:
   redis:
     image: redis:${REDIS_VERSION:-7.0-rc-alpine}
     container_name: nextcloud_redis
-    volumes:
-      - ${NEXTCLOUD_PATH}/redis:/data
+    # volumes:
+    #   - ${NEXTCLOUD_PATH}/redis:/data
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
