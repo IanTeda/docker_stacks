@@ -5,12 +5,12 @@ services:
     image: lscr.io/linuxserver/unifi-controller:7.0.25-ls147
     container_name: unifi-controller_app
     environment:
-      - PUID=${{PUID}}
-      - PGID=${{PGID}}
+      - PUID=${PUID}
+      - PGID=${PGID}
       - MEM_LIMIT=1024 #optional
       - MEM_STARTUP=1024 #optional
     volumes:
-      - ${{UNIFI_PATH}}:/config
+      - ${UNIFI_PATH}:/config
     ports:
       - 8443:8443
       - 3478:3478/udp
