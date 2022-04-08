@@ -1,0 +1,14 @@
+---
+version: '3.3'
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1.13.2
+    container_name: uptime_kuma_app
+    volumes:
+      - ${KUMA_PATH}:/app/data
+    ports:
+      - 13301:3001
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
