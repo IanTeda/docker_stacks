@@ -1,0 +1,24 @@
+---
+version: "3"
+services:
+  unifi-controller:
+    image: lscr.io/linuxserver/unifi-controller:7.0.25-ls147
+    container_name: unifi-controller_app
+    environment:
+      - PUID=${{PUID}}
+      - PGID=${{PGID}}
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+    volumes:
+      - ${{UNIFI_PATH}}:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    restart: unless-stopped
