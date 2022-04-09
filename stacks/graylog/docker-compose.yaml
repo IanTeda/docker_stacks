@@ -29,8 +29,8 @@ services:
       - "12201:12201/udp" # GELF UDP
       #- "10000:10000/tcp" # Custom TCP port
       #- "10000:10000/udp" # Custom UDP port
-      - "13301:13301/tcp" # Forwarder data
-      - "13302:13302/tcp" # Forwarder config
+      # - "13301:13301/tcp" # Forwarder data
+      # - "13302:13302/tcp" # Forwarder config
     volumes:
       - ${GRAYLOG_PATH}/data:/usr/share/graylog/data/data
       - ${GRAYLOG_PATH}/journal:/usr/share/graylog/data/journal
