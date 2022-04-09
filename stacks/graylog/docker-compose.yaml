@@ -39,6 +39,7 @@ services:
   mongodb:
     image: mongo:${MONGO_VERSION:-4.2}
     container_name: graylog_mongodb
+    user: ${PUID}:${PGID}
     volumes:
       - ${GRAYLOG_PATH}/mongodb:/data/db
     restart: unless-stopped
@@ -56,6 +57,7 @@ services:
       memlock:
         hard: -1
         soft: -1
+    user: ${PUID}:${PGID}
     volumes:
       - ${GRAYLOG_PATH}/elasticsearch:/usr/share/elasticsearch/data
     restart: unless-stopped
