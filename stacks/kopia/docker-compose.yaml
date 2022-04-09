@@ -1,7 +1,9 @@
+---
 version: '3.7'
+
 services:
     kopia:
-        image: kopia/kopia:latest
+        image: kopia/kopia:${KOPIA_VERSION:-0.10}
         container_name: kopia_app
         hostname: ${KOPIA_HOSTNAME}
         user: "${PUID}:${PGID}"
