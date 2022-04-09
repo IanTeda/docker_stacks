@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   graylog:
-    image: graylog/graylog:${GRAYLOG_VERSION:-4.2}
+    image: graylog/graylog:${GRAYLOG_VERSION:-4.2.7}
     container_name: graylog_app
     depends_on:
       elasticsearch:
@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:${MONGO_VERSION:-5.0}
+    image: mongo:${MONGO_VERSION:-4.2}
     container_name: graylog_mongodb
     volumes:
       - ${GRAYLOG_PATH}/mongodb:/data/db
