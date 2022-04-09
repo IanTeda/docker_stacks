@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  app:
+    image: lscr.io/linuxserver/booksonic-air:${VERSION:-v2201.1.0-ls50}
+    container_name: booksonic_app
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - CONTEXT_PATH=${BOOKSONIC_BASE_URL}
+    volumes:
+      - ${BOOKSONIC_DIRECTORY}:/config
+      - ${AUDIOBOOK_DIRECTORY}:/audiobooks
+      # - ${PODCAST_DIRECTORY}:/podcasts
+      # - ${OTHER_MEDIA_DIRECTORY}:/othermedia
+    ports:
+      - 12040:4040
+    restart: unless-stopped
