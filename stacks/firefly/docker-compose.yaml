@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   app:
-    image: fireflyiii/core:version-5.6.16
+    image: fireflyiii/core:${FIREFLY_VERSION:-version-5.6.16}
     container_name: firefly_app
     environment:
       - SITE_OWNER=${FIREFLY_SITE_OWNER}
@@ -21,11 +21,13 @@ services:
       - 11080:8080
     restart: unless-stopped
     depends_on:
-      - mariadb
-      - redis
+      mariadb:
+        condition: "service_started"
+      redis:
+        condition: "service_started"
 
   mariadb:
-    image: lscr.io/linuxserver/mariadb:10.5.15-r0-ls51
+    image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-10.5.15-r0-ls51}
     container_name: firefly_mariadb    
     environment:
       - PUID=${PUID}
@@ -39,7 +41,7 @@ services:
       - ${FIREFLY_PATH}/mariadb:/config
     restart: unless-stopped
 
-    redis:
-      image: redis:7.0-rc-alpine
-      container_name: firefly_redis
-      restart: unless-stopped
+  redis:
+    image: redis:${REDIS_VERSION:-7.0-rc-alpine}
+    container_name: firefly_redis
+    restart: unless-stopped
