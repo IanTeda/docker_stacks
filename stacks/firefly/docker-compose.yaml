@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   app:
-    image: fireflyiii/core:${FIREFLY_VERSION:-version-5.6.16}
+    image: fireflyiii/core:${FIREFLY_VERSION:-version-5.7.5}
     container_name: firefly_app
     environment:
       - SITE_OWNER=${FIREFLY_SITE_OWNER}
@@ -25,6 +25,22 @@ services:
         condition: "service_started"
       redis:
         condition: "service_started"
+
+  data-importer:
+    image: fireflyiii/data-importer:${FIREFLY_IMPORTER_VERSION:-version-0.9.10}
+    container_name: firefly_importer
+    environment:
+    - FIREFLY_III_ACCESS_TOKEN=${FIREFLY_ACCESS_TOKEN}
+    - FIREFLY_III_URL=${FIREFLY_URL}
+    # - NORDIGEN_ID=(here)
+    # - NORDIGEN_KEY=(here)
+    # - SPECTRE_APP_ID=(here)
+    # - SPECTRE_SECRET=(here)
+    ports:
+      - 11081:8080
+    restart: unless-stopped
+    depends_on:
+      app
 
   mariadb:
     image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-10.5.15-r0-ls51}
