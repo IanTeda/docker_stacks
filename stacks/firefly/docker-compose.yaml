@@ -40,7 +40,7 @@ services:
       - 11081:8080
     restart: unless-stopped
     depends_on:
-      app
+      - app
 
   mariadb:
     image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-10.5.15-r0-ls51}
