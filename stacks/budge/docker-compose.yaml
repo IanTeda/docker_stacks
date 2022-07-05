@@ -1,0 +1,23 @@
+---
+version: "3"
+services:
+  unifi-controller:
+    # https://github.com/linuxserver/docker-budge/releases
+    image: lscr.io/linuxserver/budge:${BUDGE_VERSION:-0.0.9-ls25}
+    container_name: budge_app
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BUDGE_PATH}:/config
+    ports:
+      # - 14800:80
+      - 14443:443
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:443 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
