@@ -3,7 +3,7 @@ version: '3'
 
 services:
   app:
-    image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_VERSION:-23.0.3-ls176}
+    image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_VERSION:-latest}
     container_name: nextcloud_app
     environment:
       - PUID=${PUID}
@@ -24,7 +24,7 @@ services:
         condition: "service_started"
     
   mariadb:
-    image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-10.5.15-r0-ls51}
+    image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-latest}
     container_name: nextcloud_mariadb
     environment:
       - PUID=${PUID}
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:${REDIS_VERSION:-7.0-rc-alpine}
+    image: redis:${REDIS_VERSION:-latest}
     container_name: nextcloud_redis
     # volumes:
     #   - ${NEXTCLOUD_PATH}/redis:/data
