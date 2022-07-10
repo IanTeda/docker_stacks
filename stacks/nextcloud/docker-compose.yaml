@@ -3,6 +3,7 @@ version: '3'
 
 services:
   app:
+    # https://github.com/linuxserver/docker-nextcloud/releases
     image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_VERSION:-latest}
     container_name: nextcloud_app
     environment:
@@ -24,6 +25,7 @@ services:
         condition: "service_started"
     
   mariadb:
+    # https://github.com/linuxserver/docker-mariadb/releases
     image: lscr.io/linuxserver/mariadb:${MARIADB_VERSION:-latest}
     container_name: nextcloud_mariadb
     environment:
@@ -41,6 +43,7 @@ services:
     restart: unless-stopped
 
   redis:
+    # https://hub.docker.com/_/redis?tab=tags
     image: redis:${REDIS_VERSION:-latest}
     container_name: nextcloud_redis
     # volumes:
