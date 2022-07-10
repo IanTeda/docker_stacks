@@ -3,7 +3,7 @@ version: '3'
 
 services:
   app:
-    image: lscr.io/linuxserver/heimdall:${HEIMDALL_VERSION:-v2.4.8-ls165}
+    image: lscr.io/linuxserver/heimdall:${HEIMDALL_VERSION:-latest}
     container_name: heimdall_app
     environment:
       - PUID=${PUID}
