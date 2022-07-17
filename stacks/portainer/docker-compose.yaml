@@ -1,14 +1,16 @@
 version: "3"
 services:
   portainer:
-    image: portainer/portainer-ce:${PORTAINER_VERSION:-2.14.0}
+    # https://github.com/portainer/portainer
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-latest}
     container_name: portainer_app
     environment:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${PORTAINER_PATH}:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PORTAINER_PATH}:/data:Z
     ports:
       # - 8000:8000/tcp ## This second port is optional and only required if using Edge Compute features with Edge Agents
       - 9443:9443/tcp
-    restart: always
+    restart: unless-stopped

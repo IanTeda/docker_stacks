@@ -2,23 +2,24 @@
 version: "3"
 services:
   unifi-controller:
-    image: lscr.io/linuxserver/unifi-controller:7.0.25-ls147
-    container_name: unifi_controller_app
+    # https://github.com/linuxserver/docker-unifi-controller/releases
+    image: lscr.io/linuxserver/unifi-controller:${UNIFI_VERSION:-7.1.66-ls157}
+    container_name: unifi_controller
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - MEM_LIMIT=1024 #optional
-      - MEM_STARTUP=1024 #optional
+      - MEM_LIMIT=1024 ## Optionally change the Java memory limit. Set to default to reset to default
+      - MEM_STARTUP=1024 ## Optionally change the Java initial/minimum memory. Set to default to reset to default
     volumes:
       - ${UNIFI_PATH}:/config
     ports:
-      - 18443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      # - 8080:8080 ## http port
-      - 1900:1900/udp #optional
-      - 8843:8843 #optional
-      - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
+      - 58443:8443 ## Unifi web admin port
+      - 53478:3478/udp ## Unifi STUN port
+      - 10001:10001/udp ## Required for AP discovery
+      - 58080:8080 ## Required for device communication
+      - 51900:1900/udp ## Required for Make controller discoverable on L2 network option
+      - 58843:8843 ## Unifi guest portal HTTPS redirect port
+      - 58880:8880 ## Unifi guest portal HTTP redirect port
+      - 56789:6789 ## For mobile throughput test
+      - 55514:5514/udp ## Remote syslog port
     restart: unless-stopped
