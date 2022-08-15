@@ -51,3 +51,26 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+  
+  postfix:
+    # https://hub.docker.com/r/takeyamajp/postfix/
+    image: takeyamajp/postfix:${POSTFIX_VERSION:-latest}
+    container_name: nextcloud_postfix
+    # ports:  
+    #   - "8025:25"  
+    #   - "8587:587"  
+    #   - "8465:465"  
+    volumes:  
+      - ${NEXTCLOUD_PATH}/postfix/certs:/ssl_certs  
+      - ${NEXTCLOUD_PATH}/postfix/keys:/dkim_keys  
+    environment:  
+      TIMEZONE: ${TZ}  
+      HOSTNAME: ${POSTFIX_HOSTNAME} 
+      DOMAIN_NAME: ${POSTFIX_DOMAIN_NAME} 
+      MESSAGE_SIZE_LIMIT: "10240000"  
+      AUTH_USER: ${POSTFIX_AUTH_USER}@${POSTFIX_DOMAIN_NAME} 
+      AUTH_PASSWORD: ${POSTFIX_AUTH_PASSWORD}  
+      DISABLE_SMTP_AUTH_ON_PORT_25: "true"  
+      ENABLE_DKIM: "true"  
+      DKIM_KEY_LENGTH: "1024"  
+      DKIM_SELECTOR: "default"
