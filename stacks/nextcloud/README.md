@@ -25,3 +25,13 @@ To use a reverse proxy you domain needs to be added as a trusted_domain in `/con
     'nextcloud.domain.com'
 ],
 ```
+
+## SMTP Settings
+
+* Send Mode: SMTP
+* Encryption: SSL/TLS
+* From: nextcloud@mydomain.com
+* Authentication method: Login
+* Authentication Required: Yes
+* Server address: smtp.gmail.com:465
+* Credentials: gmailusername/app-password-in-settings
