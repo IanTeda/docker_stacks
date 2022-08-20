@@ -62,6 +62,7 @@ services:
       AUTHENTIK_EMAIL__USE_SSL: ${AUTHENTIK_EMAIL__USE_SSL}
       AUTHENTIK_EMAIL__TIMEOUT: ${AUTHENTIK_EMAIL__TIMEOUT}
       AUTHENTIK_EMAIL__FROM: ${AUTHENTIK_EMAIL__FROM}
+    user: ${PUID}:${GUID}
     volumes:
       - ${AUTHENTIK_PATH}/media:/media
       - ${AUTHENTIK_PATH}/custom-templates:/templates
