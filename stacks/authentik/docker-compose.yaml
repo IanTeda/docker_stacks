@@ -102,7 +102,7 @@ services:
     # This is optional, and can be removed. If you remove this, the following will happen
     # - The permissions for the /media folders aren't fixed, so make sure they are 1000:1000
     # - The docker socket can't be accessed anymore
-    user: root
+    user: 1027:100
     volumes:
       - ${AUTHENTIK_PATH}/media:/media
       - ${AUTHENTIK_PATH}/certs:/certs
