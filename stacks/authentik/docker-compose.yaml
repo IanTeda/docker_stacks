@@ -21,7 +21,7 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: authentik_alpine
+    container_name: authentik_redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
