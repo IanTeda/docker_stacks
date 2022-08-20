@@ -68,8 +68,8 @@ services:
       - ${AUTHENTIK_PATH}/custom-templates:/templates
       - ${AUTHENTIK_PATH}/geoip:/geoip
     ports:
-      # - "0.0.0.0:${AUTHENTIK_PORT_HTTP:-9000}:9000"
-      - ${AUTHENTIK_PORT_HTTPS:-9443}:9443
+      - "0.0.0.0:${AUTHENTIK_PORT_HTTP:-9000}:9000"
+      - "0.0.0.0:${AUTHENTIK_PORT_HTTPS:-9443}:9443"
     depends_on:
       postgresql:
         condition: "service_started"
