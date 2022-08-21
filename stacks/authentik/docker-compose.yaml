@@ -11,7 +11,7 @@ services:
       - POSTGRES_USER=authentik
       - POSTGRES_DB=authentik
     volumes:
-      - ${AUTHENTIK_PATH}/postgresql:/var/lib/postgresql/data
+      - database:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 20s
@@ -62,11 +62,11 @@ services:
       AUTHENTIK_EMAIL__USE_SSL: ${AUTHENTIK_EMAIL__USE_SSL}
       AUTHENTIK_EMAIL__TIMEOUT: ${AUTHENTIK_EMAIL__TIMEOUT}
       AUTHENTIK_EMAIL__FROM: ${AUTHENTIK_EMAIL__FROM}
-    user: ${PUID}:${PGID}
+    # user: ${PUID}:${PGID}
     volumes:
-      - ${AUTHENTIK_PATH}/media:/media
-      - ${AUTHENTIK_PATH}/custom-templates:/templates
-      - ${AUTHENTIK_PATH}/geoip:/geoip
+      - authentik:/media
+      - authentik:/templates
+      - geoip:/geoip
     ports:
       - "0.0.0.0:${AUTHENTIK_PORT_HTTP:-9000}:9000"
       - "0.0.0.0:${AUTHENTIK_PORT_HTTPS:-9443}:9443"
@@ -104,12 +104,12 @@ services:
     # This is optional, and can be removed. If you remove this, the following will happen
     # - The permissions for the /media folders aren't fixed, so make sure they are 1000:1000
     # - The docker socket can't be accessed anymore
-    user: ${PUID}:${PGID}
+    user: root
     volumes:
-      - ${AUTHENTIK_PATH}/media:/media
-      - ${AUTHENTIK_PATH}/certs:/certs
-      - ${AUTHENTIK_PATH}/custom-templates:/templates
-      - ${AUTHENTIK_PATH}/geoip:/geoip
+      - authentik:/media
+      - authentik:/certs
+      - authentik:/templates
+      - geoip:/geoip
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       postgresql:
@@ -118,3 +118,11 @@ services:
         condition: "service_started"
       geoipupdate:
         condition: "service_started"
+
+volumes:
+  database:
+    driver: local
+  geoip:
+    driver: local
+  authentik:
+    driver: local
