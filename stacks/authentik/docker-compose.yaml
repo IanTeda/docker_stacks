@@ -79,6 +79,12 @@ services:
         condition: "service_started"
       worker:
         condition: "service_started"
+    labels:
+      flame.type: application
+      flame.name: Authentik
+      flame.url: ${AUTHENTIK_URL}
+      # flame.icon=icon-name # optional, default is "docker"
+      flame.icon: custom # to make changes in app. ie: custom icon upload
 
   worker:
     image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION:-latest}
