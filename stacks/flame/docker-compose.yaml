@@ -12,9 +12,14 @@ services:
       - "0.0.0.0:${FLAME_PORT:-5005}:5005"
     environment:
       - PASSWORD=${FLAME_PASSWORD}
-    healthcheck:
-      test: "curl --fail http://localhost:${FLAME_PORT:-5005}:5005 || exit 1"
-      interval: 60s
-      retries: 5
-      start_period: 60s
-      timeout: 10s
+    # healthcheck:
+    #   test: "curl --fail https://localhost:${FLAME_PORT:-5005}:5005 || exit 1"
+    #   interval: 60s
+    #   retries: 5
+    #   start_period: 60s
+    #   timeout: 10s    # healthcheck:
+    #   test: "curl --fail https://localhost:${FLAME_PORT:-5005}:5005 || exit 1"
+    #   interval: 60s
+    #   retries: 5
+    #   start_period: 60s
+    #   timeout: 10s
