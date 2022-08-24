@@ -70,6 +70,8 @@ services:
     ports:
       # - "0.0.0.0:${AUTHENTIK_PORT_HTTP:-9000}:9000"
       - "0.0.0.0:${AUTHENTIK_PORT_HTTPS:-9443}:9443"
+      - "0.0.0.0:${AUTHENTIK_PORT_LDAP:-9386}:386"
+      - "0.0.0.0:${AUTHENTIK_PORT_LDAPS:-9686}:686"
     depends_on:
       postgresql:
         condition: "service_started"
