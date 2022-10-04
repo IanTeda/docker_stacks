@@ -18,7 +18,7 @@ services:
       DEFAULT_EMAIL: ${MEALIE_EMAIL:-changeme@email.com}
       BASE_URL: ${MEALIE_URL:-http://localhost}${MEALIE_PORT:-9090}
     volumes:
-      - ${MEALIE_PATH:-~/Docker/mealie}/app:/app/data
+      - ${MEALIE_PATH:-~/Docker/mealie}:/app/data
     ports:
       - ${MEALIE_PORT:-9090}:80
     restart: unless-stopped
