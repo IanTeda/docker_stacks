@@ -1,0 +1,24 @@
+version: "3.1"
+services:
+  mealie:
+    # https://docs.mealie.io/documentation/getting-started/install/
+    image: hkotel/mealie:${MEALIE_VERSION:-latest}
+    container_name: mealie_app
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-UTC}
+      # Default Recipe Settings
+      RECIPE_PUBLIC: 'true'
+      RECIPE_SHOW_NUTRITION: 'true'
+      RECIPE_SHOW_ASSETS: 'true'
+      RECIPE_LANDSCAPE_VIEW: 'true'
+      RECIPE_DISABLE_COMMENTS: 'false'
+      RECIPE_DISABLE_AMOUNT: 'false'
+      DEFAULT_EMAIL: ${MEALIE_EMAIL:-changeme@email.com}
+      BASE_URL: ${MEALIE_URL:-http://localhost}${MEALIE_PORT:-9090}
+    volumes:
+      - ${MEALIE_PATH:-~/Docker/mealie}/app:/app/data
+    ports:
+      - ${MEALIE_PORT:-9090}:80
+    restart: unless-stopped
