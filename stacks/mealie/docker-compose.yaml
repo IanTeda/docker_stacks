@@ -1,24 +1,79 @@
-version: "3.1"
+---
+version: "3.7"
 services:
-  mealie:
-    # https://docs.mealie.io/documentation/getting-started/install/
-    image: hkotel/mealie:${MEALIE_VERSION:-latest}
-    container_name: mealie_app
+  # https://nightly.mealie.io/documentation/getting-started/installation/sqlite/
+  mealie_frontend:
+    image: hkotel/mealie:${MEALIE_FRONTEND_VERSION:-frontend-nightly}
+    container_name: mealie_frontend
     environment:
+      # Set Frontend ENV Variables Here
+      API_URL: http://mealie_api:9000
+      ALLOW_SIGNUP: ${MEALIE_SIGNUP:-false}
+    restart: unless-stopped
+    ports:
+      - ${MEALIE_PORT:-9090}:3000
+    volumes:
+      - ${MEALIE_PATH:-~/Docker/mealie}:/app/data/
+    depends_on:
+      mealie_api:
+        condition: "service_started"
+  mealie_api:
+    image: hkotel/mealie:${MEALIE_BACKEND_VERSION:-api-nightly}
+    container_name: mealie_api
+    volumes:
+      - ${MEALIE_PATH:-~/Docker/mealie}:/app/data/
+    environment:
+      # Set Backend ENV Variables Here
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-UTC}
-      # Default Recipe Settings
-      RECIPE_PUBLIC: 'true'
-      RECIPE_SHOW_NUTRITION: 'true'
-      RECIPE_SHOW_ASSETS: 'true'
-      RECIPE_LANDSCAPE_VIEW: 'true'
-      RECIPE_DISABLE_COMMENTS: 'false'
-      RECIPE_DISABLE_AMOUNT: 'false'
+      # Defaults
       DEFAULT_EMAIL: ${MEALIE_EMAIL:-changeme@email.com}
-      BASE_URL: ${MEALIE_URL:-http://localhost}${MEALIE_PORT:-9090}
-    volumes:
-      - ${MEALIE_PATH:-~/Docker/mealie}:/app/data
-    ports:
-      - ${MEALIE_PORT:-9090}:80
+      BASE_URL: ${MEALIE_URL:-http://localhost}:${MEALIE_PORT:-9090}
+      ALLOW_SIGNUP: ${MEALIE_SIGNUP:-false}
+      MAX_WORKERS: 1
+      WEB_CONCURRENCY: 1
+      # Email settings
+      SMTP_HOST: ${MEALIE_SMTP_HOST}
+      SMTP_PORT: ${MEALIE_SMTP_PORT:-587}
+      SMTP_FROM_NAME: ${MEALIE_SMTP_FROM_NAME:-Mealie}
+      SMTP_FROM_EMAIL: ${MEALIE_SMTP_FROM_EMAIL:-changeme@gmail.com}
+      SMTP_AUTH_STRATEGY: ${MEALIE_SMTP_AUTH_STRATEGY:-TLS}
+      SMTP_USER: ${MEALIE_SMTP_USER}
+      SMTP_PASSWORD: ${MEALIE_SMTP_PASSWORD}
+      # LDAP settings
+      LDAP_AUTH_ENABLED: ${MEALIE_LDAP_AUTH_ENABLED:-false}
+      LDAP_SERVER_URL: ${MEALIE_LDAP_SERVER_URL:-ldap://ldap.example.com}
+      LDAP_TLS_INSECURE: ${MEALIE_LDAP_TLS_INSECURE:-false}
+      LDAP_BIND_TEMPLATE: ${MEALIE_LDAP_BIND_TEMPLATE:-"cn={},dc=example,dc=com, {}@example.com"}
+      LDAP_BASE_DN: ${MEALIE_LDAP_BASE_DN:-"CN=Users,DC=xx,DC=yy,DC=de"}
+      LDAP_ADMIN_FILTER: ${MEALIE_LDAP_ADMIN_FILTER:-"(memberOf=cn=admins,dc=example,dc=com)"}
+
     restart: unless-stopped
+
+# services:
+#   mealie:
+#     # https://docs.mealie.io/documentation/getting-started/install/
+#     image: hkotel/mealie:${MEALIE_VERSION:-latest}
+#     container_name: mealie_app
+#     environment:
+#       PUID: ${PUID:-1000}
+#       PGID: ${PGID:-1000}
+#       TZ: ${TZ:-UTC}
+#       # Default Recipe Settings
+#       RECIPE_PUBLIC: 'true'
+#       RECIPE_SHOW_NUTRITION: 'true'
+#       RECIPE_SHOW_ASSETS: 'true'
+#       RECIPE_LANDSCAPE_VIEW: 'true'
+#       RECIPE_DISABLE_COMMENTS: 'false'
+#       RECIPE_DISABLE_AMOUNT: 'false'
+#       DEFAULT_EMAIL: ${MEALIE_EMAIL:-changeme@email.com}
+#       BASE_URL: ${MEALIE_URL:-http://localhost}${MEALIE_PORT:-9090}
+#       MAX_WORKERS: 1
+#       WEB_CONCURRENCY: 1
+#     volumes:
+#       - ${MEALIE_PATH:-~/Docker/mealie}:/app/data
+#     ports:
+#       - ${MEALIE_PORT:-9090}:80
+#     restart: unless-stopped
+
