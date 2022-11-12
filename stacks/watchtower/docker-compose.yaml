@@ -1,0 +1,13 @@
+version: "3"
+services:
+  watchtower:
+    ## https://containrrr.dev/watchtower/
+    image: containrrr/watchtower:${WATCHTOWER_VERSION:-latest}
+    container_name: watchtower_app
+    environment:
+      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
+      - WATCHTOWER_LABEL_ENABLE=${WATCHTOWER_LABEL_ENABLE}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
