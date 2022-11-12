@@ -5,8 +5,9 @@ services:
     image: containrrr/watchtower:${WATCHTOWER_VERSION:-latest}
     container_name: watchtower_app
     environment:
-      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP}
-      - WATCHTOWER_LABEL_ENABLE=${WATCHTOWER_LABEL_ENABLE}
+      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP:-false}
+      - WATCHTOWER_LABEL_ENABLE=${WATCHTOWER_LABEL_ENABLE:-false}
+      - WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE:-0 0 0 * * *} ## https://pkg.go.dev/github.com/robfig/cron@v1.2.0#hdr-CRON_Expression_Format
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
