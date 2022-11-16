@@ -48,8 +48,9 @@ services:
       LDAP_BIND_TEMPLATE: ${MEALIE_LDAP_BIND_TEMPLATE:-"cn={},dc=example,dc=com, {}@example.com"}
       LDAP_BASE_DN: ${MEALIE_LDAP_BASE_DN:-"CN=Users,DC=xx,DC=yy,DC=de"}
       LDAP_ADMIN_FILTER: ${MEALIE_LDAP_ADMIN_FILTER:-"(memberOf=cn=admins,dc=example,dc=com)"}
-
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
 # services:
 #   mealie:

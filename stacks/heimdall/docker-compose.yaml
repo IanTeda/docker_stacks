@@ -5,6 +5,7 @@ services:
   app:
     image: lscr.io/linuxserver/heimdall:${HEIMDALL_VERSION:-latest}
     container_name: heimdall_app
+    restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -13,4 +14,5 @@ services:
       - ${HEIMDALL_PATH}:/config
     ports:
       - 11443:443
-    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
