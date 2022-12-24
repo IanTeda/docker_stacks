@@ -12,29 +12,29 @@ services:
       - POSTGRES_DB=authentik
     volumes:
       - database:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+    #   start_period: 20s
+    #   interval: 30s
+    #   retries: 5
+    #   timeout: 5s
 
   redis:
     image: redis:${REDIS_VERSION:-alpine}
     container_name: authentik_redis
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+    #   start_period: 20s
+    #   interval: 30s
+    #   retries: 5
+    #   timeout: 3s
 
   geoipupdate:
     image: "maxmindinc/geoipupdate:${GEOIPUPDATE_VERSION:-latest}"
     container_name: authentik_geoipupdate
     volumes:
-      - geoip:/usr/share/GeoIP
+      - authentik:/usr/share/GeoIP
     environment:
       GEOIPUPDATE_EDITION_IDS: "GeoLite2-City"
       GEOIPUPDATE_FREQUENCY: "8"
@@ -66,7 +66,7 @@ services:
     volumes:
       - authentik:/media
       - authentik:/templates
-      - geoip:/geoip
+      - authentik:/geoip
     ports:
       # - "0.0.0.0:${AUTHENTIK_PORT_HTTP:-9000}:9000"
       - "0.0.0.0:${AUTHENTIK_PORT_HTTPS:-9443}:9443"
@@ -109,7 +109,7 @@ services:
       - authentik:/media
       - authentik:/certs
       - authentik:/templates
-      - geoip:/geoip
+      - authentik:/geoip
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       postgresql:
