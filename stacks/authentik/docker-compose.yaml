@@ -3,7 +3,7 @@ version: '3.4'
 
 services:
   postgresql:
-    image: postgres:12-alpine
+    image: postgres:${POSTGRESQL_VERSION:-alpine}
     container_name: authentik_postgresql
     restart: unless-stopped
     environment:
@@ -20,7 +20,7 @@ services:
       timeout: 5s
 
   redis:
-    image: redis:alpine
+    image: redis:${REDIS_VERSION:-alpine}
     container_name: authentik_redis
     restart: unless-stopped
     healthcheck:
