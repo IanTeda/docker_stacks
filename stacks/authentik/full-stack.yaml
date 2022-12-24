@@ -72,12 +72,21 @@ services:
       - "0.0.0.0:${AUTHENTIK_PORT_HTTPS:-9443}:9443"
       - "0.0.0.0:${AUTHENTIK_PORT_LDAP:-9386}:386"
       - "0.0.0.0:${AUTHENTIK_PORT_LDAPS:-9686}:686"
+    healthcheck:
+      test: curl --fail http://localhost:9000 || exit 1
+      #  test: wget --no-verbose --tries=1 --spider http://localhost || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     depends_on:
       postgresql:
         condition: "service_started"
       redis:
         condition: "service_started"
       geoipupdate:
+        condition: "service_started"
+      worker:
         condition: "service_started"
 
   worker:
@@ -111,6 +120,12 @@ services:
       - authentik:/templates
       - geoip:/geoip
       - /var/run/docker.sock:/var/run/docker.sock
+    # healthcheck:
+    #   test: curl --fail http://localhost:9000 || exit 1
+    #   interval: 60s
+    #   retries: 5
+    #   start_period: 20s
+    #   timeout: 10s
     depends_on:
       postgresql:
         condition: "service_started"
