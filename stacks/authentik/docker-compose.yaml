@@ -118,3 +118,6 @@ services:
         condition: "service_started"
       geoipupdate:
         condition: "service_started"
+
+volumes:
+  authentik:
