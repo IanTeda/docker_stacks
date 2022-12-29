@@ -27,8 +27,8 @@ services:
       - mariadb
       - redis
     networks:
-      - cloudflared_tunnel_network
       - default
+      - cloudflared_tunnel_network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     
