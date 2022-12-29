@@ -31,6 +31,7 @@ services:
       - redis
     networks:
       - cloudflared_tunnel_network
+      - default
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     
