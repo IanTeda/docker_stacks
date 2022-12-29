@@ -1,6 +1,12 @@
 ---
 version: '3'
 
+networks:
+  default: # this docker-compose network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
 services:
   app:
     # https://github.com/linuxserver/docker-nextcloud/releases
@@ -13,16 +19,18 @@ services:
     volumes:
       - ${NEXTCLOUD_PATH}/config:/config
       - ${NEXTCLOUD_PATH}/data:/data
-    ports:
-      - 3443:443
+      - /etc/localtime:/etc/localtime:ro
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    links:
+      - mariadb
+      - redis
     depends_on:
-      mariadb:
-        condition: "service_started"
-      redis:
-        condition: "service_started"
+      - mariadb
+      - redis
+    networks:
+      - cloudflared_tunnel_network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     
