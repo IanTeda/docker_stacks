@@ -16,3 +16,5 @@ services:
     restart: unless-stopped
     networks:
       - tunnel_network # Other contianers to connect to the tunnel through cloudfalre_tunnel_network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
