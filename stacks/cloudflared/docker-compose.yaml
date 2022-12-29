@@ -1,6 +1,10 @@
 ---
 version: '3'
 
+networks:
+  tunnel_network:
+    driver: bridge
+
 services:
   cloudflared:
     # https://github.com/cloudflare/cloudflared/releases
@@ -11,8 +15,4 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
     restart: unless-stopped
     networks:
-      - tunnel_network
-
-networks:
-  tunnel_network:
-    driver: bridge
+      - tunnel_network # Other contianers to connect to the tunnel through cloudfalre_tunnel_network
