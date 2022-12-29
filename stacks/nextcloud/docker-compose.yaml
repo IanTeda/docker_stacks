@@ -23,9 +23,6 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    links:
-      - mariadb
-      - redis
     depends_on:
       - mariadb
       - redis
@@ -52,6 +49,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    networks:
+      - default
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -64,5 +63,7 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+    networks:
+      - default
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
