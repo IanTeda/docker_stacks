@@ -20,13 +20,12 @@ services:
       - ${NEXTCLOUD_PATH}/config:/config
       - ${NEXTCLOUD_PATH}/data:/data
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3443:443/tcp
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
     depends_on:
-      - mariadb
-      - redis
-    links: 
       - mariadb
       - redis
     networks:
@@ -61,8 +60,6 @@ services:
     # https://hub.docker.com/_/redis?tab=tags
     image: redis:${REDIS_VERSION:-latest}
     container_name: nextcloud_redis
-    # volumes:
-    #   - ${NEXTCLOUD_PATH}/redis:/data
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
