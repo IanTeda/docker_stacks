@@ -35,7 +35,6 @@ services:
       - ${MEALIE_PATH:-~/Docker/mealie}:/app/data/
     networks:
       - default
-      - cloudflared_tunnel_network
     environment:
       # Set Backend ENV Variables Here
       PUID: ${PUID:-1000}
