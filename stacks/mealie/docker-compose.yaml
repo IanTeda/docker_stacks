@@ -1,5 +1,12 @@
 ---
 version: "3.7"
+
+networks:
+  default: # this docker-compose network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
 services:
   # https://nightly.mealie.io/documentation/getting-started/installation/sqlite/
   mealie_frontend:
@@ -10,6 +17,9 @@ services:
       API_URL: http://mealie_api:9000
       ALLOW_SIGNUP: ${MEALIE_SIGNUP:-false}
     restart: unless-stopped
+    networks:
+      - default
+      - cloudflared_tunnel_network
     ports:
       - ${MEALIE_PORT:-9090}:3000
     volumes:
@@ -17,11 +27,15 @@ services:
     depends_on:
       mealie_api:
         condition: "service_started"
+
   mealie_api:
     image: hkotel/mealie:${MEALIE_BACKEND_VERSION:-api-nightly}
     container_name: mealie_api
     volumes:
       - ${MEALIE_PATH:-~/Docker/mealie}:/app/data/
+    networks:
+      - default
+      - cloudflared_tunnel_network
     environment:
       # Set Backend ENV Variables Here
       PUID: ${PUID:-1000}
