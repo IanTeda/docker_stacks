@@ -1,4 +1,11 @@
 version: "3"
+
+networks:
+  default: # this docker-compose network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
 services:
   portainer:
     # https://github.com/portainer/portainer
@@ -10,6 +17,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${PORTAINER_PATH}:/data:Z
+    networks:
+      - default
+      - cloudflared_tunnel_network
     ports:
       # - 8000:8000/tcp ## This second port is optional and only required if using Edge Compute features with Edge Agents
       - 9443:9443/tcp
