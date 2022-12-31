@@ -26,6 +26,18 @@ To use a reverse proxy you domain needs to be added as a trusted_domain in `/con
 ],
 ```
 
+## Increase PHP Memory Usage
+
+/www/nextcloud/.htaccess
+
+```properties
+php_value upload_max_filesize 16G
+php_value post_max_size 16G
+php_value max_input_time 3600
+php_value max_execution_time 3600
+php_value memory_limit 2048M
+```
+
 ## SMTP Settings
 
 * Send Mode: SMTP
@@ -35,3 +47,8 @@ To use a reverse proxy you domain needs to be added as a trusted_domain in `/con
 * Authentication Required: Yes
 * Server address: smtp.gmail.com:465
 * Credentials: gmailusername/app-password-in-settings
+
+
+### References
+
+* [NextCloud with CloudFlare Tunnels](https://dbt3ch.com/books/nextcloud-with-cloudflare-tunnels/page/nextcloud-with-cloudflare-tunnels)
