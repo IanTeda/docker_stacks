@@ -1,0 +1,38 @@
+version: '3.2'
+
+networks:
+  default: # this docker-compose network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
+services:
+  prometheus:
+    # https://hub.docker.com/r/prom/prometheus/tags
+    image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ${PROMETHEUS_PATH}:/etc/prometheus
+      # - ${PROMETHEUS_PATH}/data:/prometheus
+    restart: unless-stopped
+    # command:
+    #   - '--config.file=/etc/prometheus/prometheus.yml'
+    #   - '--storage.tsdb.path=/prometheus'
+    #   - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+    #   - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-latest}
+    container_name: grafana
+    user: "0"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${GRAFANA_PATH}:/var/lib/grafana
+    # environment:
+    #   GF_DEFAULT_INSTANCE_NAME=my-grafana
+    #   GF_SECURITY_ADMIN_USER=demo
+    #   GF_SECURITY_ADMIN_PASSWORD=grafana
+    restart: unless-stopped
