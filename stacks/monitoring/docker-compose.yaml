@@ -11,8 +11,9 @@ services:
     # https://hub.docker.com/r/prom/prometheus/tags
     image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
     container_name: prometheus
+    user: "${PUID}"
     ports:
-      - 9090:9090
+      - "9090:9090"
     volumes:
       - ${PROMETHEUS_PATH}:/etc/prometheus
       # - ${PROMETHEUS_PATH}/data:/prometheus
@@ -26,7 +27,7 @@ services:
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-latest}
     container_name: grafana
-    user: "0"
+    user: "${PUID}"
     ports:
       - "3000:3000"
     volumes:
