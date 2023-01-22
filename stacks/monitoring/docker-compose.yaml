@@ -114,6 +114,7 @@ services:
       - cloudflared_tunnel_network
     volumes:
       - ${GRAFANA_PATH}:/var/lib/grafana
+      - ${GRAFANA_PATH}/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
