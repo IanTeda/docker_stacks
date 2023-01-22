@@ -16,7 +16,7 @@ services:
       - "9090:9090"
     volumes:
       - ${PROMETHEUS_PATH}:/etc/prometheus
-      # - ${PROMETHEUS_PATH}/data:/prometheus
+      - ${PROMETHEUS_PATH}/data:/prometheus
     restart: unless-stopped
     # command:
     #   - '--config.file=/etc/prometheus/prometheus.yml'
