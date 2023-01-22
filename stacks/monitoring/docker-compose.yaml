@@ -127,7 +127,7 @@ services:
       - PORT=8083
       - INTERVAL=15 # In minutes
       - CALLBACK=${SPEEDTEST_CALLBACK}
-    ports:
-      - "8083:8083"
+    # ports: # Commented out because we are using the docker network and do not need to open ports
+    #   - "8083:8083"
     networks:
       - default
