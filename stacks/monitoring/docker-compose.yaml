@@ -13,6 +13,8 @@ services:
     image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
     container_name: prometheus
     user: "${PUID}"
+    networks:
+      - monitoring_network
     ports:
       - "9090:9090"
     volumes:
@@ -36,6 +38,7 @@ services:
     ports:
       - "3000:3000"
     networks:
+      - monitoring_network
       - cloudflared_tunnel_network
     volumes:
       - ${GRAFANA_PATH}:/var/lib/grafana
