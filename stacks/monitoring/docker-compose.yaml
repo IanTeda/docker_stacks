@@ -80,7 +80,7 @@ services:
 
   # Host metrics collector
   nodeexporter:
-    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v0.18.1}
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-latest}
     container_name: monitoring_node_exporter
     # ports:
     #   - 9100:9100
@@ -119,4 +119,15 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
-  
+  speedtest:
+    # https://github.com/beykansen/internet-speed-monitor
+    image: ghcr.io/beykansen/internet-speed-monitor:${INTERNET_SPEED_MONITOR_VERSION:-latest}
+    container_name: monitoring_speedtest
+    environment:
+      - PORT=8083
+      - INTERVAL=15 # In minutes
+      - CALLBACK='${SPEEDTEST_CALLBACK}'
+    ports:
+      - "8083:8083"
+    networks:
+      - default
