@@ -26,6 +26,8 @@ services:
     #   - '--storage.tsdb.path=/prometheus'
     #   - '--web.console.libraries=/usr/share/prometheus/console_libraries'
     #   - '--web.console.templates=/usr/share/prometheus/consoles'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-latest}
@@ -47,3 +49,5 @@ services:
     #   GF_SECURITY_ADMIN_USER=demo
     #   GF_SECURITY_ADMIN_PASSWORD=grafana
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
