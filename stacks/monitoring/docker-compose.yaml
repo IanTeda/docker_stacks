@@ -51,7 +51,7 @@ services:
   redis:
     # https://hub.docker.com/_/redis?tab=tags
     image: redis:${REDIS_VERSION:-latest}
-    container_name: nextcloud_redis
+    container_name: monitoring_redis
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -114,10 +114,6 @@ services:
       - cloudflared_tunnel_network
     volumes:
       - ${GRAFANA_PATH}:/var/lib/grafana
-    # environment:
-    #   GF_DEFAULT_INSTANCE_NAME=my-grafana
-    #   GF_SECURITY_ADMIN_USER=demo
-    #   GF_SECURITY_ADMIN_PASSWORD=grafana
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
