@@ -29,8 +29,14 @@ services:
     image: grafana/grafana:${GRAFANA_VERSION:-latest}
     container_name: grafana
     user: "${PUID}"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=changeme
+      - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3000:3000"
+    networks:
+      - cloudflared_tunnel_network
     volumes:
       - ${GRAFANA_PATH}:/var/lib/grafana
     # environment:
