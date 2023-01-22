@@ -1,4 +1,13 @@
+# Monitoring
 
+Docker compose stack for monitoring the home server and network.
+
+
+# Prometheus
+
+Prometheus.yml needs to be copied into prometheus bind volume
+
+We also need to bind the data folder, which is mentioned on the Prometheus docs.
 
 
 #### Reference
