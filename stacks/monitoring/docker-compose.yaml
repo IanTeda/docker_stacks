@@ -14,7 +14,7 @@ services:
     container_name: prometheus
     user: "${PUID}"
     networks:
-      - monitoring_network
+      - default
     ports:
       - "9090:9090"
     volumes:
@@ -38,7 +38,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - monitoring_network
+      - default
       - cloudflared_tunnel_network
     volumes:
       - ${GRAFANA_PATH}:/var/lib/grafana
