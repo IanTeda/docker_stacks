@@ -29,6 +29,76 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
+  alertmanager:
+    # https://hub.docker.com/r/prom/alertmanager/tags
+    image: prom/alertmanager:${ALERTMANAGER_VERSION:-latest}
+    container_name: alertmanager
+    user: "${PUID}"
+    networks:
+      - default
+    ports:
+      - "9093:9093"
+    volumes:
+      - ${ALERTMANAGER_PATH}:/etc/alertmanager
+      # - ${ALERTMANAGER_PATH}/data:/alertmanager
+    restart: unless-stopped
+    # command:
+      # - '--config.file=/etc/alertmanager/alertmanager.yml'
+      # - '--storage.path=/alertmanager'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  redis:
+    # https://hub.docker.com/_/redis?tab=tags
+    image: redis:${REDIS_VERSION:-latest}
+    container_name: nextcloud_redis
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - default
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Docker metrics collector
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-latest}
+    container_name: cadvisor
+    ports:
+      - 8080:8080
+    networks:
+      - default
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+      - redis
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Host metrics collector
+  nodeexporter:
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-v0.18.1}
+    container_name: node_exporter
+    ports:
+      - 9100:9100
+    networks:
+      - default
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-latest}
     container_name: grafana
