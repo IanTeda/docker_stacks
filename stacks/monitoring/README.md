@@ -9,6 +9,9 @@ Prometheus.yml needs to be copied into prometheus bind volume
 
 We also need to bind the data folder, which is mentioned on the Prometheus docs.
 
+## Speedtest
+
+https://grafana.com/grafana/dashboards/17105-internet-speed-monitor/
 
 #### Reference
 
