@@ -131,3 +131,6 @@ services:
     #   - "8083:8083"
     networks:
       - default
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
