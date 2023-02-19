@@ -1,6 +1,13 @@
 ---
 version: '3'
 
+networks:
+  default: # this docker-compose network
+    driver: bridge
+    name: heimdall
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
 services:
   app:
     image: lscr.io/linuxserver/heimdall:${HEIMDALL_VERSION:-latest}

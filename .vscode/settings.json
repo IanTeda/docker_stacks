@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
+        "alertmanager",
         "Authentik",
+        "cadvisor",
+        "CLOUDFLARED",
         "Dockerfiles",
         "filebrowser",
         "KOPIA",
@@ -9,8 +12,13 @@
         "lscr",
         "MARIADB",
         "mealie",
+        "nodeexporter",
+        "PGID",
+        "PUID",
         "Redash",
         "SIGNUP",
+        "timeseries",
         "UNIFI"
-    ]
+    ],
+    "sqltools.connections": []
 }

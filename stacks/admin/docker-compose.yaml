@@ -1,0 +1,76 @@
+version: "3"
+
+networks:
+  default: # this docker-compose network
+    name: admin_network
+    driver: bridge
+  tunnel_network: # Cloudflare zero trust tunnel network
+    name: tunnel_network
+    driver: bridge
+
+services:
+  watchtower:
+    ## https://containrrr.dev/watchtower/
+    image: containrrr/watchtower:${WATCHTOWER_VERSION:-latest}
+    container_name: admin_watchtower
+    environment:
+      - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP:-false}
+      - WATCHTOWER_LABEL_ENABLE=${WATCHTOWER_LABEL_ENABLE:-false}
+      - WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE:-0 0 0 * * *} ## https://pkg.go.dev/github.com/robfig/cron@v1.2.0#hdr-CRON_Expression_Format
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+
+  cloudflared_tunnel:
+    # https://github.com/cloudflare/cloudflared/releases
+    image: cloudflare/cloudflared:${CLOUDFLARED_VERSION:-latest}
+    container_name: admin_cloudflared_tunnel
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+    restart: unless-stopped
+    networks:
+      - tunnel_network # Other contianers to connect to the tunnel through tunnel_network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  portainer:
+    # https://github.com/portainer/portainer
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-latest}
+    container_name: admin_portainer
+    depends_on:
+      - cloudflared_tunnel
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PORTAINER_PATH}:/data:Z
+    networks:
+      - tunnel_network
+    # ports: # Not needed because we are going to use the tunnel
+      # - 8000:8000/tcp ## This second port is optional and only required if using Edge Compute features with Edge Agents
+      # - 9443:9443/tcp
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:${HEIMDALL_VERSION:-latest}
+    container_name: admin_heimdall
+    depends_on:
+     - cloudflared_tunnel
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${HEIMDALL_PATH}:/config
+    networks:
+      - tunnel_network
+    # ports: # Not needed because we are going to use the tunnel
+    #   - 11443:443
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
