@@ -102,7 +102,7 @@ services:
 
   # https://github.com/grafana/grafana
   grafana:
-    image: grafana/grafana:${GRAFANA_VERSION:-latest}
+    image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
     container_name: monitoring_grafana
     user: "${PUID}"
     environment:
