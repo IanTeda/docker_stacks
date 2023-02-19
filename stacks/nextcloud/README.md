@@ -16,7 +16,7 @@ To use Redis `/config/www/nextcloud/config/config.php needs to be updated to inc
 
 ## Reverse Proxy
 
-To use a reverse proxy you domain needs to be added as a trusted_domain in `/config/www/nextcloud/config/config.php
+To use a reverse proxy your domain needs to be added as a trusted_domain in `/config/www/nextcloud/config/config.php
 
 ```php
 'trusted_domains' =>
@@ -47,6 +47,10 @@ php_value memory_limit 2048M
 * Authentication Required: Yes
 * Server address: smtp.gmail.com:465
 * Credentials: gmailusername/app-password-in-settings
+
+## Cloudflare
+
+Use internal docker container names for FQN in cloudflare.
 
 
 ### References

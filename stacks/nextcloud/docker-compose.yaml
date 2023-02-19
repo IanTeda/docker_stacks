@@ -3,12 +3,13 @@ version: '3'
 
 networks:
   default: # this docker-compose network
+    name: nextcloud_network
     driver: bridge
-  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+  tunnel_network: # Cloudflare zero trust tunnel network
     external: true
 
 services:
-  app:
+  nextcloud:
     # https://github.com/linuxserver/docker-nextcloud/releases
     image: lscr.io/linuxserver/nextcloud:${NEXTCLOUD_VERSION:-latest}
     container_name: nextcloud_app
@@ -21,7 +22,7 @@ services:
       - ${NEXTCLOUD_PATH}/data:/data
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - 3443:443/tcp
+      - 3443:443/tcp # Can be commented out once cloudflare up
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -30,7 +31,7 @@ services:
       - redis
     networks:
       - default
-      - cloudflared_tunnel_network
+      - tunnel_network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     
@@ -51,8 +52,8 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    networks:
-      - default
+    # networks:
+    #   - default
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -63,7 +64,7 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
-    networks:
-      - default
+    # networks:
+    #   - default
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
