@@ -3,8 +3,9 @@ version: "3.7"
 
 networks:
   default: # this docker-compose network
+    name: mealie_network
     driver: bridge
-  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+  tunnel_network: # Cloudflare zero trust tunnel network
     external: true
 
 services:
@@ -19,7 +20,7 @@ services:
     restart: unless-stopped
     networks:
       - default
-      - cloudflared_tunnel_network
+      - tunnel_network
     ports:
       - ${MEALIE_PORT:-9090}:3000
     volumes:
