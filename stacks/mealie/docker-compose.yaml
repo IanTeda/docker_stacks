@@ -21,8 +21,8 @@ services:
     networks:
       - default
       - tunnel_network
-    ports:
-      - ${MEALIE_PORT:-9090}:3000
+    # ports:
+    #   - ${MEALIE_PORT:-9090}:3000
     volumes:
       - ${MEALIE_PATH:-~/Docker/mealie}:/app/data/
     depends_on:
