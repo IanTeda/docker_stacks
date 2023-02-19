@@ -19,3 +19,4 @@ https://grafana.com/grafana/dashboards/17105-internet-speed-monitor/
 * [](https://ducko.uk/installing-grafana-prometheus-via-docker-to-monitor-raspberry-pi-metrics/)
 * [](https://github.com/Einsteinish/Docker-Compose-Prometheus-and-Grafana)
 * [](https://bogotobogo.com/DevOps/Docker/Docker_Prometheus_Grafana.php)
+* [](https://dimmaski.com/prometheus-telegraf-grafana/)
