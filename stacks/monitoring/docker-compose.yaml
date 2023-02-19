@@ -18,8 +18,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ${PROMETHEUS_PATH}:/etc/prometheus
-      - ${PROMETHEUS_PATH}/data:/prometheus
+      - ${MONITORING_PATH}/prometheus:/etc/prometheus
+      - ${MONITORING_PATH}/prometheus/data:/prometheus
     restart: unless-stopped
     # command:
     #   - '--config.file=/etc/prometheus/prometheus.yml'
@@ -116,8 +116,8 @@ services:
       - default
       - tunnel_network
     volumes:
-      - ${GRAFANA_PATH}:/var/lib/grafana
-      - ${GRAFANA_PATH}/provisioning:/etc/grafana/provisioning
+      - ${MONITORING_PATH}/grafana:/var/lib/grafana
+      - ${MONITORING_PATH}/grafana/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -145,8 +145,8 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - ${INFLUXDB_PATH}/data:/var/lib/influxdb2
-      - ${INFLUXDB_PATH}/config:/etc/influxdb2
+      - ${MONITORING_PATH}/influxdb/data:/var/lib/influxdb2
+      - ${MONITORING_PATH}/influxdb/config:/etc/influxdb2
     environment:
       - INFLUXDB_DB=telegraf
       - INFLUXDB_USER=telegraf
@@ -164,7 +164,7 @@ services:
     image: telegraf:${TELEGRAF_VERSION:-latest}
     container_name: monitoring_telegraf
     volumes:
-      - ${TELEGRAF_PATH}/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ${MONITORING_PATH}/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     ports:
      - "9273:9273"
     networks:
