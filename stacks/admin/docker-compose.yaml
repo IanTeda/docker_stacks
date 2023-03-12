@@ -69,8 +69,8 @@ services:
       - ${HEIMDALL_PATH}:/config
     networks:
       - tunnel_network
-    # ports: # Not needed because we are going to use the tunnel
-    #   - 11443:443
+    ports: # Not needed because we are going to use the tunnel
+      - 11443:443
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
