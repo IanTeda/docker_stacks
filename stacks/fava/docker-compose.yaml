@@ -13,7 +13,11 @@ services:
     # entrypoint: 
     #   - fava
     #   - ${BEANCOUNT_FILE}
-    ports:
-      - 11155:5000
+    # ports:
+    #   - 11155:5000
+    networks:
+      - tunnel_network
     user: "${PUID}:${PGID}"
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
