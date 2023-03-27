@@ -1,5 +1,12 @@
 ---
 version: "3"
+
+networks:
+  # Cloudflare zero trust tunnel network
+  tunnel_network:
+    external: true
+
+
 services:
   fava:
     # https://hub.docker.com/r/yegle/fava
