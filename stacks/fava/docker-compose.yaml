@@ -1,0 +1,19 @@
+---
+version: "3"
+services:
+  fava:
+    # https://hub.docker.com/r/yegle/fava
+    # https://github.com/yegle/fava-docker
+    image: yegle/fava:${FAVA_VERSION:-latest}
+    container_name: fava_app
+    volumes:
+      - ${BEANCOUNT_PATH}:/bean
+    environment:
+      - BEANCOUNT_FILE=${BEANCOUNT_FILE}
+    # entrypoint: 
+    #   - fava
+    #   - ${BEANCOUNT_FILE}
+    ports:
+      - 11155:5000
+    user: "${PUID}:${PGID}"
+    restart: unless-stopped
