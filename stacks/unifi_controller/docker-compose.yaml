@@ -16,9 +16,11 @@ services:
       - 3478:3478/udp ## Unifi STUN port
       - 10001:10001/udp ## Required for AP discovery
       - 5514:5514/udp ## Remote syslog port
-      - 8080:8080 ## Required for device communication
-      - 8843:8843 ## Unifi guest portal HTTPS redirect port
-      - 1900:1900/udp ## Required for Make controller discoverable on L2 network option
-      - 8880:8880 ## Unifi guest portal HTTP redirect port
-      - 6789:6789 ## For mobile throughput test
+      - 8080:8080/tcp ## Required for device communication
+      - 8843:8843/tcp ## Unifi guest portal HTTPS redirect port
+      # - 1900:1900/udp ## Required for Make controller discoverable on L2 network option
+      - 8880:8880/tcp ## Unifi guest portal HTTP redirect port
+      - 6789:6789/tcp ## For mobile throughput test
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
