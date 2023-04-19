@@ -3,7 +3,7 @@ version: "3"
 services:
   unifi-controller:
     # https://github.com/linuxserver/docker-unifi-controller/releases
-    image: lscr.io/linuxserver/unifi-controller:${UNIFI_VERSION:-7.1.66-ls157}
+    image: lscr.io/linuxserver/unifi-controller:${UNIFI_VERSION:-latest}
     container_name: unifi_controller
     environment:
       - PUID=${PUID}
@@ -13,13 +13,12 @@ services:
     volumes:
       - ${UNIFI_PATH}:/config
     ports:
-      - 58443:8443 ## Unifi web admin port
-      - 53478:3478/udp ## Unifi STUN port
+      - 3478:3478/udp ## Unifi STUN port
       - 10001:10001/udp ## Required for AP discovery
-      - 58080:8080 ## Required for device communication
-      - 51900:1900/udp ## Required for Make controller discoverable on L2 network option
-      - 58843:8843 ## Unifi guest portal HTTPS redirect port
-      - 58880:8880 ## Unifi guest portal HTTP redirect port
-      - 56789:6789 ## For mobile throughput test
-      - 55514:5514/udp ## Remote syslog port
+      - 5514:5514/udp ## Remote syslog port
+      - 8080:8080 ## Required for device communication
+      - 8843:8843 ## Unifi guest portal HTTPS redirect port
+      - 1900:1900/udp ## Required for Make controller discoverable on L2 network option
+      - 8880:8880 ## Unifi guest portal HTTP redirect port
+      - 6789:6789 ## For mobile throughput test
     restart: unless-stopped
