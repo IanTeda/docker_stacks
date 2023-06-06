@@ -77,6 +77,7 @@ services:
       - geoip
     ports:
       - ${PLAUSIBLE_PORT:-8000}:8000
+    ## https://plausible.io/docs/self-hosting-configuration?ref=linuxhandbook.com
     environment:
       - ADMIN_USER_EMAIL=${PLAUSIBLE_ADMIN_USER_EMAIL}
       - ADMIN_USER_NAME=${PLAUSIBLE_ADMIN_USER_NAME}
