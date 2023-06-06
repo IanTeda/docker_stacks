@@ -1,0 +1,105 @@
+---
+version: '3.3'
+## https://github.com/plausible/hosting
+
+networks:
+  default: # this docker-compose network
+    name: plausible_network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
+services:
+  postgres:
+    # https://hub.docker.com/_/postgres/
+    image: postgres:${POSTGRES_VERSION:-14-alpine} # Plausible supported versions are 12, 13, and 14
+    container_name: plausible_postgres
+    environment:
+      - POSTGRES_USER=plausible
+      - POSTGRES_PASSWORD=${PLAUSIBLE_DB_PASSWORD:-plausible}
+      - POSTGRES_DB=plausible
+    volumes:
+      - ${PLAUSIBLE_PATH}/postgres:/var/lib/postgresql/data
+    # security_opt:
+    #   - no-new-privileges:true
+    # healthcheck:
+    #   test: [“CMD-SHELL”, “pg_isready”]
+    #     interval    : 1s
+    #   timeout: 5s
+    #     retries: 10
+    restart: unless-stopped
+    # labels:
+    #   - "com.centurylinklabs.watchtower.enable=true"
+  
+  clickhouse:
+    ## https://hub.docker.com/r/clickhouse/clickhouse-server
+    image: clickhouse/clickhouse-server:${CLICKHOUST_VERSION:-latest-alpine}
+    container_name: plausible_clickhouse
+    environment:
+      - CLICKHOUSE_DB=plausible
+      - CLICKHOUSE_USER=plausible
+      - CLICKHOUSE_PASSWORD=${PLAUSIBLE_DB_PASSWORD:-plausible}
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - ${PLAUSIBLE_PATH}/clickhouse:/var/lib/clickhouse
+      - ${PLAUSIBLE_PATH}/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro # Copy into mounted volume
+      - ${PLAUSIBLE_PATH}/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro # Copy into mounted volume
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+  
+  geoip:
+    image: maxmindinc/geoipupdate:${GEOIPUPDATE_VERSION:-latest}
+    container_name: plausible_geoipupdate
+    environment:
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+      - GEOIPUPDATE_FREQUENCY=168 ## update every 7 days
+      - GEOIPUPDATE_ACCOUNT_ID=${PLAUSIBLE_GEOIPUPDATE_ACCOUNT_ID} ## https://www.maxmind.com/en/home
+      - GEOIPUPDATE_LICENSE_KEY=${PLAUSIBLE_GEOIPUPDATE_LICENSE_KEY} ## https://www.maxmind.com/en/accounts/756446/license-key/create
+    volumes:
+      - ${PLAUSIBLE_PATH}/geoip:/usr/share/GeoIP
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+  
+  plausible:
+    ## https://hub.docker.com/r/plausible/analytics
+    image: plausible/analytics:${ANALYTICS_VERSION:-latest}
+    container_name: plausible_app
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    depends_on:
+      - postgres
+      - clickhouse
+      - geoip
+    ports:
+      - ${PLAUSIBLE_PORT:-8000}:8000
+    environment:
+      - ADMIN_USER_EMAIL=${PLAUSIBLE_ADMIN_USER_EMAIL}
+      - ADMIN_USER_NAME=${PLAUSIBLE_ADMIN_USER_NAME}
+      - ADMIN_USER_PWD=${PLAUSIBLE_ADMIN_USER_PWD}
+      - BASE_URL=${PLAUSIBLE_BASE_URL}
+      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE} # openssl rand -base64 64
+      - DISABLE_REGISTRATION:${PLAUSIBLE_DISABLE_REGISTRATION:-true}
+      - GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
+      - DATABASE_URL=postgres://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible_postgres:5432/plausible
+      - CLICKHOUSE_DATABASE_URL=http://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible_clickhouse:8123/plausible
+      # - MAILER_EMAIL=plausible-admin@domain.com
+      # - SMTP_HOST_ADDR=smtp.sendgrid.net
+      # - SMTP_HOST_PORT=465
+      # - SMTP_USER_NAME=apikey
+      # - SMTP_USER_PWD=replace-me
+      # - SMTP_HOST_SSL_ENABLED=true
+      # - SMTP_RETRIES=20
+      # - CRON_ENABLED=true
+    volumes:
+      - ${PLAUSIBLE_PATH}/geoip:/geoip:ro
+    networks:
+      - default
+      - cloudflared_tunnel_network
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
