@@ -2,7 +2,7 @@
 version: '3'
 
 networks:
-  tunnel_network:
+  network:
     driver: bridge
 
 services:
@@ -15,6 +15,6 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
     restart: unless-stopped
     networks:
-      - tunnel_network # Other contianers to connect to the tunnel through cloudflared_tunnel_network
+      - network # Other contianers to connect to the tunnel through cloudflared_tunnel_network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
