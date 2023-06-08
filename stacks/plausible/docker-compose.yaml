@@ -105,10 +105,10 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
-volumes:
-  postgres:
-    driver: local
-  clickhouse:
-    driver: local
-  geoip:
-    driver: local
+# volumes:
+#   postgres:
+#     driver: local
+#   clickhouse:
+#     driver: local
+#   geoip:
+#     driver: local
