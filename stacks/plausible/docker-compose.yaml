@@ -91,7 +91,7 @@ services:
       - ${PLAUSIBLE_PATH}/geoip:/geoip:ro
     networks:
       - default
-      - cloudflared_tunnel_network
+      - tunnel_network
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
