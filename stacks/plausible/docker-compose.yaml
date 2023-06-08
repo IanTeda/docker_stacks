@@ -2,12 +2,12 @@
 version: '3.3'
 ## https://github.com/plausible/hosting
 
-networks:
-  default: # this docker-compose network
-    name: plausible_network
-    driver: bridge
-  tunnel_network: # Cloudflare zero trust tunnel network
-    external: true
+# networks:
+#   default: # this docker-compose network
+#     name: plausible_network
+#     driver: bridge
+#   tunnel_network: # Cloudflare zero trust tunnel network
+#     external: true
 
 services:
   postgres:
@@ -33,8 +33,8 @@ services:
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
     volumes:
       - ${PLAUSIBLE_PATH}/clickhouse:/var/lib/clickhouse
-      # - ${PLAUSIBLE_PATH}/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro # Copy into mounted volume
-      # - ${PLAUSIBLE_PATH}/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro # Copy into mounted volume
+      - ${PLAUSIBLE_PATH}/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro # Copy into mounted volume
+      - ${PLAUSIBLE_PATH}/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro # Copy into mounted volume
     ulimits:
       nofile:
         soft: 262144
@@ -89,9 +89,9 @@ services:
       # - CRON_ENABLED=true
     volumes:
       - ${PLAUSIBLE_PATH}/geoip:/geoip:ro
-    networks:
-      - default
-      - tunnel_network
+    # networks:
+    #   - default
+    #   - tunnel_network
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
