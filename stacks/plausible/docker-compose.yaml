@@ -86,8 +86,8 @@ services:
       - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE} # openssl rand -base64 64
       - DISABLE_REGISTRATION:${PLAUSIBLE_DISABLE_REGISTRATION:-true}
       - GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
-      - DATABASE_URL=postgres://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible_postgres.plausible_network:5432/plausible
-      - CLICKHOUSE_DATABASE_URL=http://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible_clickhouse.plausible_network:8123/plausible
+      - DATABASE_URL=postgres://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@postgres:5432/plausible
+      - CLICKHOUSE_DATABASE_URL=http://plausible:${PLAUSIBLE_DB_PASSWORD:-plausible}@clickhouse:8123/plausible
       # - MAILER_EMAIL=plausible-admin@domain.com
       # - SMTP_HOST_ADDR=smtp.sendgrid.net
       # - SMTP_HOST_PORT=465
