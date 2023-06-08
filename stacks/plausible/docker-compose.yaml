@@ -42,8 +42,8 @@ services:
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
     volumes:
       - ${PLAUSIBLE_PATH}/clickhouse:/var/lib/clickhouse
-      - ${PLAUSIBLE_PATH}/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro # Copy into mounted volume
-      - ${PLAUSIBLE_PATH}/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro # Copy into mounted volume
+      - ${PLAUSIBLE_PATH}/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro # Copy into mounted volume
+      - ${PLAUSIBLE_PATH}/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro # Copy into mounted volume
     ulimits:
       nofile:
         soft: 262144
