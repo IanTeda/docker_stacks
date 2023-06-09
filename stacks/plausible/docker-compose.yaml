@@ -19,7 +19,7 @@ services:
       - POSTGRES_PASSWORD=postgres
 
   plausible_events_db:
-    image: clickhouse/clickhouse-server:22.6-alpine
+    image: clickhouse/clickhouse-server:${CLICKHOUST_VERSION:-latest}
     container_name: plausible_clickhouse
     restart: unless-stopped
     volumes:
