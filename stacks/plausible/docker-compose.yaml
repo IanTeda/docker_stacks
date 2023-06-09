@@ -9,7 +9,7 @@ services:
     image: postgres:14-alpine
     restart: always
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ${PLAUSIBLE_PATH}/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
 
@@ -17,9 +17,10 @@ services:
     image: clickhouse/clickhouse-server:22.6-alpine
     restart: always
     volumes:
-      - event-data:/var/lib/clickhouse
-      # - ./clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
-      # - ./clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+      - ${PLAUSIBLE_PATH}/clickhouse:/var/lib/clickhouse
+      - ${PLAUSIBLE_PATH}/log:/var/log/clickhouse-server
+      - ${PLAUSIBLE_PATH}:/etc/clickhouse-server/config.d/logging.xml:ro
+      - ${PLAUSIBLE_PATH}:/etc/clickhouse-server/users.d/logging.xml:ro
     ulimits:
       nofile:
         soft: 262144
@@ -38,13 +39,3 @@ services:
     environment:
       - BASE_URL=${PLAUSIBLE_BASE_URL}
       - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
-    # env_file:
-    #   - plausible-conf.env
-
-volumes:
-  db-data:
-    driver: local
-  event-data:
-    driver: local
-  geoip:
-    driver: local
