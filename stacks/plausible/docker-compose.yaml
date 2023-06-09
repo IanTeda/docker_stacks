@@ -10,7 +10,7 @@ services:
   plausible_db:
     # https://hub.docker.com/_/postgres/
     # supported versions are 12, 13, and 14
-    image: postgres:${POSTGRES_VERSION:-14-alpine} 
+    image: postgres:${PLAUSIBLE_POSTGRES_VERSION:-14-alpine} 
     container_name: plausible_postgres
     restart: unless-stopped
     volumes:
@@ -20,7 +20,7 @@ services:
 
   plausible_events_db:
     # https://hub.docker.com/r/clickhouse/clickhouse-server
-    image: clickhouse/clickhouse-server:${CLICKHOUST_VERSION:-latest}
+    image: clickhouse/clickhouse-server:${PLAUSIBLE_CLICKHOUST_VERSION:-latest}
     container_name: plausible_clickhouse
     restart: unless-stopped
     volumes:
@@ -35,7 +35,7 @@ services:
 
   geoip:
     # https://hub.docker.com/r/maxmindinc/geoipupdate
-    image: maxmindinc/geoipupdate:${GEOIPUPDATE_VERSION:-latest}
+    image: maxmindinc/geoipupdate:${PLAUSIBLE_GEOIPUPDATE_VERSION:-latest}
     container_name: plausible_geoipupdate
     restart: unless-stopped
     environment:
