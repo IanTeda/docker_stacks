@@ -2,12 +2,12 @@ version: "3.3"
 services:
   mail:
     image: bytemark/smtp
-    restart: always
+    restart: unless-stopped
 
   plausible_db:
     # supported versions are 12, 13, and 14
     image: postgres:14-alpine
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${PLAUSIBLE_PATH}/postgres:/var/lib/postgresql/data
     environment:
@@ -15,7 +15,7 @@ services:
 
   plausible_events_db:
     image: clickhouse/clickhouse-server:22.6-alpine
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${PLAUSIBLE_PATH}/clickhouse:/var/lib/clickhouse
       - ${PLAUSIBLE_PATH}/log:/var/log/clickhouse-server
@@ -26,14 +26,27 @@ services:
         soft: 262144
         hard: 262144
 
+  geoip:
+    image: maxmindinc/geoipupdate:${GEOIPUPDATE_VERSION:-latest}
+    container_name: plausible_geoipupdate
+    restart: unless-stopped
+    environment:
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+      - GEOIPUPDATE_FREQUENCY=168 ## update every 7 days
+      - GEOIPUPDATE_ACCOUNT_ID=${PLAUSIBLE_GEOIPUPDATE_ACCOUNT_ID} ## https://www.maxmind.com/en/home
+      - GEOIPUPDATE_LICENSE_KEY=${PLAUSIBLE_GEOIPUPDATE_LICENSE_KEY} ## https://www.maxmind.com/en/accounts/756446/license-key/create
+    volumes:
+      - ${PLAUSIBLE_PATH}/geoip:/usr/share/GeoIP
+
   plausible:
     image: plausible/analytics:v1.5
-    restart: always
+    restart: unless-stopped
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     depends_on:
       - plausible_db
       - plausible_events_db
       - mail
+      - geoip
     ports:
       - 8000:8000
     environment:
