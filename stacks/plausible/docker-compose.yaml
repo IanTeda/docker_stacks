@@ -1,5 +1,5 @@
 version: "3.3"
-## https://github.com/plausible/hosting
+# https://github.com/plausible/hosting
 
 services:
   mail:
@@ -19,6 +19,7 @@ services:
       - POSTGRES_PASSWORD=postgres
 
   plausible_events_db:
+    # https://hub.docker.com/r/clickhouse/clickhouse-server
     image: clickhouse/clickhouse-server:${CLICKHOUST_VERSION:-latest}
     container_name: plausible_clickhouse
     restart: unless-stopped
@@ -33,6 +34,7 @@ services:
         hard: 262144
 
   geoip:
+    # https://hub.docker.com/r/maxmindinc/geoipupdate
     image: maxmindinc/geoipupdate:${GEOIPUPDATE_VERSION:-latest}
     container_name: plausible_geoipupdate
     restart: unless-stopped
@@ -45,6 +47,7 @@ services:
       - ${PLAUSIBLE_PATH}/geoip:/usr/share/GeoIP
 
   plausible:
+    # https://hub.docker.com/r/plausible/analytics
     image: plausible/analytics:${PLAUSIBLE_ANALYTICS_VERSION:-latest}
     container_name: plausible_app
     restart: unless-stopped
