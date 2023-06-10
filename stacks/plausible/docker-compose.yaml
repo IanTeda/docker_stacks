@@ -22,12 +22,13 @@ services:
     restart: unless-stopped
     volumes:
       - ${PLAUSIBLE_PATH}/postgres:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - POSTGRES_PASSWORD=postgres
 
   plausible_events_db:
     # https://hub.docker.com/r/clickhouse/clickhouse-server
-    image: clickhouse/clickhouse-server:${PLAUSIBLE_CLICKHOUST_VERSION:-latest}
+    image: clickhouse/clickhouse-server:${PLAUSIBLE_CLICKHOUST_VERSION:-22.6-alpine}
     container_name: plausible_clickhouse
     restart: unless-stopped
     volumes:
@@ -35,6 +36,7 @@ services:
       - ${PLAUSIBLE_PATH}/log:/var/log/clickhouse-server
       - ${PLAUSIBLE_PATH}:/etc/clickhouse-server/config.d/logging.xml:ro
       - ${PLAUSIBLE_PATH}:/etc/clickhouse-server/users.d/logging.xml:ro
+      - /etc/localtime:/etc/localtime:ro
     ulimits:
       nofile:
         soft: 262144
@@ -42,7 +44,7 @@ services:
 
   geoip:
     # https://hub.docker.com/r/maxmindinc/geoipupdate
-    image: maxmindinc/geoipupdate:${PLAUSIBLE_GEOIPUPDATE_VERSION:-latest}
+    image: maxmindinc/geoipupdate:${PLAUSIBLE_GEOIPUPDATE_VERSION:-v5}
     container_name: plausible_geoipupdate
     restart: unless-stopped
     environment:
@@ -55,7 +57,7 @@ services:
 
   plausible:
     # https://hub.docker.com/r/plausible/analytics
-    image: plausible/analytics:${PLAUSIBLE_ANALYTICS_VERSION:-latest}
+    image: plausible/analytics:${PLAUSIBLE_ANALYTICS_VERSION:-v1.5}
     container_name: plausible_app
     restart: unless-stopped
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
@@ -71,4 +73,13 @@ services:
       - cloudflared_tunnel_network
     environment:
       - BASE_URL=${PLAUSIBLE_BASE_URL}
-      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
+      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE} # openssl rand -base64 64 | tr -d '\n' ; echo
+      - DISABLE_REGISTRATION=true
+      - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL}
+      - SMTP_HOST_ADDR=smtp.gmail.com
+      - SMTP_HOST_PORT=587
+      - SMTP_USER_NAME=${PLAUSIBLE_SMTP_USER_NAME}
+      - SMTP_USER_PWD=${PLAUSIBLE_SMTP_USER_PWD}
+      - SMTP_HOST_SSL_ENABLED=true
+      - SMTP_RETRIES=20
+      - CRON_ENABLED=true
