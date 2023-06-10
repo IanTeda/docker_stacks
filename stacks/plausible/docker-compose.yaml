@@ -66,8 +66,9 @@ services:
       - plausible_events_db
       - mail
       - geoip
-    ports:
-      - 8000:8000
+    ## Ports not needed as we are using a Clodflare tunnel
+    # ports:
+    #   - 8000:8000
     networks:
       - default
       - cloudflared_tunnel_network
