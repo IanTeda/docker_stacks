@@ -1,6 +1,13 @@
 version: "3.3"
 # https://github.com/plausible/hosting
 
+networks:
+  default: # this docker-compose network
+    name: plausible_network
+    driver: bridge
+  cloudflared_tunnel_network: # Cloudflare zero trust tunnel network
+    external: true
+
 services:
   mail:
     image: bytemark/smtp
@@ -59,6 +66,9 @@ services:
       - geoip
     ports:
       - 8000:8000
+    networks:
+      - default
+      - cloudflared_tunnel_network
     environment:
       - BASE_URL=${PLAUSIBLE_BASE_URL}
       - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
