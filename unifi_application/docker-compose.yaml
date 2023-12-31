@@ -1,0 +1,66 @@
+---
+version: "3"
+
+# Name the default docker network
+networks:
+  default: # this docker-compose network
+    name: unifi_network
+    driver: bridge
+
+# Start docker services
+services:
+
+  # Mongo database 
+  mongodb:
+    image: mongo:4.4 ## Linuxserver recommends pinning to 4.4
+    container_name: unifi_mongodb
+    environment:
+      - MONGO_USER=${MONGO_USER:- unifi_application}
+      - MONGO_PASS=${MONGO_PASS:- unifi_application}
+      - MONGO_DBNAME=${MONGO_DBNAME:- unifi_application}
+      - MONGO_DBNAMESTAT=${MONGO_DBNAME:- unifi_application}_stat 
+    volumes:
+      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - ${UNIFI_PATH}/mongodb:/data/db
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Unifi console application
+  unifi_application:
+    # https://github.com/linuxserver/docker-unifi-network-application?tab=readme-ov-file 
+    image: lscr.io/linuxserver/unifi-network-application:${UNIFI_VERSION:-latest}
+    container_name: unifi_application
+    depends_on:
+      - mongodb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:- Australia/Sydney}
+      - MONGO_USER=${MONGO_USER:- unifi_application}
+      - MONGO_PASS=${MONGO_PASS:- unifi_application}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=${MONGO_DBNAME:- unifi_application}
+    volumes:
+      - ${UNIFI_PATH}/config:/config
+    ports:
+      - 8443:8443 ## HTTPS GUI
+      - 3478:3478/udp ## Unifi STUN port
+      - 10001:10001/udp ## Required for AP discovery
+      - 8081:8080/tcp ## Required for device communication, do not change from 8080 as unifi devices expect this
+      # - 1900:1900/udp ## Optional: Required for Make controller discoverable on L2 network option
+      - 8843:8843/tcp ## Optional: Unifi guest portal HTTPS redirect port
+      - 8880:8880/tcp ## Optional: Unifi guest portal HTTP redirect port
+      - 6789:6789/tcp ## Optional: For mobile throughput test
+      - 5514:5514/udp ## Optional: Remote syslog port
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+
+
+
+#### REFERENCES
+## https://github.com/thedxt/UniFi-Docker/tree/main
+
