@@ -1,14 +1,14 @@
 ---
-version: '3.8'
+version: '3'
 
 networks:
   default:
-    name: traefik_network
+    name: "traefik_network"
     driver: bridge
 
 services:
   traefik:
-    image: traefik:${TRAEFIK_VERSION:- latest}
+    image: "traefik:${TRAEFIX_VERSION:-latest}"
     container_name: "traefik"
     restart: unless-stopped
     command:
@@ -20,7 +20,6 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     ports:
       - "80:80"
