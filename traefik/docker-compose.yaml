@@ -12,19 +12,38 @@ services:
     container_name: "traefik"
     restart: unless-stopped
     command:
-      - "--accesslog=true"
-      - "--log.level=DEBUG"
+      ## Log Configuration
+      # - "--accesslog=true"
+      # - "--log.level=DEBUG"
+      ## Don't force https
       - "--api.insecure=true"
-      - "--api.dashboard=true"
+      - "--api.dashboard=false" # Disable dashboard
+      ## Entry Points 
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      ## Docker Config
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - "--providers.docker.network=traefik_network"
+      ## Misc Configuration
+      - '--global.sendanonymoususage=false'
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
       - "80:80"
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=proxy
-      - traefik.http.routers.traefik.rule=Host(`piadmin.teda.id.au/traefik`)
-      - traefik.http.routers.traefik.service=api@internal
+      - "443:443"
+      # - "8088:8080" # Access dashboard
+
+  ## Service to test traefik
+  # whoami:
+  #   image: traefik/whoami
+  #   container_name: traefik_whoami
+  #   depends_on:
+  #     - traefik
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.whoami.rule=Pathprefix(`/whoami`)
+  #     - traefik.http.services.whoami.loadbalancer.server.port=80
