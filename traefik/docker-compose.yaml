@@ -1,0 +1,31 @@
+---
+version: '3.8'
+
+networks:
+  default:
+    name: "traefik_network"
+    driver: bridge
+
+services:
+  traefik:
+    image: "traefik:${TRAEFIK_VERSION:- latest}"
+    container_name: "traefik"
+    restart: unless-stopped
+    command:
+      - "--accesslog=true"
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ports:
+      - "80:80"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.service=api@internal
