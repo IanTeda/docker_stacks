@@ -3,14 +3,12 @@ version: "3"
 
 # Name the default docker network
 networks:
-  default: # this docker-compose network
-    name: unifi_network
-    driver: bridge
+  default:
+    name: traefik_network # Setting to traefik_network for reverse proxying
+    external: true
 
-# Start docker services
 services:
-
-  # Mongo database 
+  # Mongo database service
   mongodb:
     image: mongo:4.4 ## Linuxserver recommends pinning to 4.4
     container_name: unifi_mongodb
@@ -22,11 +20,13 @@ services:
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
       - ${UNIFI_PATH}/mongodb:/data/db
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
-  # Unifi console application
+  # Unifi console application service
   unifi_application:
     # https://github.com/linuxserver/docker-unifi-network-application?tab=readme-ov-file 
     image: lscr.io/linuxserver/unifi-network-application:${UNIFI_VERSION:-latest}
@@ -36,7 +36,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ:- Australia/Sydney}
+      # - TZ=${TZ:- Australia/Sydney}
       - MONGO_USER=${MONGO_USER:- unifi_application}
       - MONGO_PASS=${MONGO_PASS:- unifi_application}
       - MONGO_HOST=mongodb
@@ -44,6 +44,8 @@ services:
       - MONGO_DBNAME=${MONGO_DBNAME:- unifi_application}
     volumes:
       - ${UNIFI_PATH}/config:/config
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
       - 8443:8443 ## HTTPS GUI
       - 3478:3478/udp ## Unifi STUN port
@@ -57,9 +59,12 @@ services:
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-
-
-
+      - "traefik.enable=true"
+      - "traefik.http.routers.unifi_application.entrypoints: https"
+      - "traefik.http.routers.unifi_application.rule=Pathprefix(`/unifi`)"
+      # - "traefik.http.routers.unifi_application.rule=Host('unifi.localhost')"
+      - "traefik.http.services.unifi_application.loadbalancer.server.port=8443"
+      - "traefik.http.services.unifi_application.loadbalancer.server.scheme=https"
 
 #### REFERENCES
 ## https://github.com/thedxt/UniFi-Docker/tree/main
