@@ -26,5 +26,5 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik.rule=Host(`traefik.piadmin.teda.id.au`)
       - traefik.http.routers.traefik.service=api@internal
