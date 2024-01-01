@@ -3,12 +3,12 @@ version: '3.8'
 
 networks:
   default:
-    name: "traefik_network"
+    name: traefik_network
     driver: bridge
 
 services:
   traefik:
-    image: "traefik:${TRAEFIK_VERSION:- latest}"
+    image: traefik:${TRAEFIK_VERSION:- latest}
     container_name: "traefik"
     restart: unless-stopped
     command:
