@@ -6,7 +6,7 @@ version: "3.8"
 
 services:
   dockge:
-    image: louislam/dockge:${DOCKAGE_VERSION:-latest}
+    image: louislam/dockge:${DOCKGE_VERSION:-latest}
     container_name: dockge
     restart: unless-stopped
     ports:
@@ -16,12 +16,13 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${STACKS_PATH:-/opt/docker_stacks}:/opt/stacks"
-      - "${DOCKAGE_PATH:-~/Docker/dockge/}/data:/app/data"
+      - "${DOCKGE_PATH:-~/Docker/dockge/}/data:/app/data"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dockge.service=dockge"
       - "traefik.http.routers.dockge.rule=Pathprefix(`/dockge`)"
       - "traefik.http.services.dockge.loadbalancer.server.port=5001"
+      - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   default:

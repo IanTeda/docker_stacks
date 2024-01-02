@@ -1,7 +1,6 @@
 ###############################################################################
 # TRAEFIX 
 # Reverse proxy
-
 ---
 version: '3.8'
 
@@ -27,7 +26,7 @@ services:
       # - "--providers.docker.network=traefik_proxy"
       ## Misc Configuration
       - '--global.sendanonymoususage=false'
-      ## [source]:[destination] 
+    ## [source]:[destination] 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/etc/timezone:/etc/timezone:ro"
@@ -37,6 +36,8 @@ services:
       - "80:80" # http entry point port
       - "443:443" # https entry point port
       # - "8088:8080" # Web GUI (dashboard) port
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
   default:
