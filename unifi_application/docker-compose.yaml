@@ -60,7 +60,7 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.unifi_application.entrypoints: https"
+      - "traefik.http.routers.unifi_application.entrypoints=https"
       - "traefik.http.routers.unifi_application.rule=Pathprefix(`/unifi`)"
       - "traefik.http.services.unifi_application.loadbalancer.server.port=8443"
       - "traefik.http.services.unifi_application.loadbalancer.server.scheme=https"
