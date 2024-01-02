@@ -1,11 +1,7 @@
+###############################################################################
+# UNIFI CONSOLE APPLICATION
 ---
 version: "3"
-
-# Name the default docker network
-networks:
-  default:
-    name: traefik_network # Setting to traefik_network for reverse proxying
-    external: true
 
 services:
   # Mongo database service
@@ -14,15 +10,15 @@ services:
     container_name: unifi_mongodb
     user: ${PUID}:${PGID}
     environment:
-      - MONGO_USER=${MONGO_USER:- unifi_application}
-      - MONGO_PASS=${MONGO_PASS:- unifi_application}
-      - MONGO_DBNAME=${MONGO_DBNAME:- unifi_application}
-      - MONGO_DBNAMESTAT=${MONGO_DBNAME:- unifi_application}_stat 
+      - MONGO_USER=${MONGO_USER:-unifi_application}
+      - MONGO_PASS=${MONGO_PASS:-unifi_application}
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi_application}
+      - MONGO_DBNAMESTAT=${MONGO_DBNAME:-unifi_application}_stat 
     volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
       - ${UNIFI_PATH}/mongodb:/data/db
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -38,11 +34,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       # - TZ=${TZ:- Australia/Sydney}
-      - MONGO_USER=${MONGO_USER:- unifi_application}
-      - MONGO_PASS=${MONGO_PASS:- unifi_application}
+      - MONGO_USER=${MONGO_USER:-unifi_application}
+      - MONGO_PASS=${MONGO_PASS:-unifi_application}
       - MONGO_HOST=mongodb
       - MONGO_PORT=27017
-      - MONGO_DBNAME=${MONGO_DBNAME:- unifi_application}
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi_application}
     volumes:
       - ${UNIFI_PATH}/config:/config
       - "/etc/timezone:/etc/timezone:ro"
@@ -63,10 +59,13 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.unifi_application.entrypoints: https"
       - "traefik.http.routers.unifi_application.rule=Pathprefix(`/unifi`)"
-      # - "traefik.http.routers.unifi_application.rule=Host('unifi.localhost')"
       - "traefik.http.services.unifi_application.loadbalancer.server.port=8443"
       - "traefik.http.services.unifi_application.loadbalancer.server.scheme=https"
 
+networks:
+  default:
+    name: traefik_proxy
+    external: true
+
 #### REFERENCES
 ## https://github.com/thedxt/UniFi-Docker/tree/main
-
