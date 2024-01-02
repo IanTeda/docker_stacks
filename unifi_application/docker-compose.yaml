@@ -4,7 +4,6 @@
 version: "3"
 
 services:
-  # Mongo database service
   mongodb:
     image: mongo:4.4 ## Linuxserver recommends pinning to 4.4
     container_name: unifi_mongodb

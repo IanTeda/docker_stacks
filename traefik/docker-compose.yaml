@@ -26,6 +26,8 @@ services:
       # - "--providers.docker.network=traefik_proxy"
       ## Misc Configuration
       - '--global.sendanonymoususage=false'
+    networks:
+      - traefik_proxy
     ## [source]:[destination] 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -40,6 +42,6 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
-  default:
+  traefik_proxy:
     name: traefik_proxy
     driver: bridge

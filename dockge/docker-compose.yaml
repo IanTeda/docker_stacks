@@ -9,6 +9,8 @@ services:
     image: louislam/dockge:${DOCKGE_VERSION:-latest}
     container_name: dockge
     restart: unless-stopped
+    networks:
+      - traefik_proxy
     ports:
       - "5001:5001"
     volumes:
@@ -19,12 +21,14 @@ services:
       - "${DOCKGE_PATH:-~/Docker/dockge/}/data:/app/data"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dockge.service=dockge"
-      - "traefik.http.routers.dockge.rule=Pathprefix(`/dockge`)"
+      - "traefik.http.routers.dockge.entrypoints=http"
+      # - "traefik.http.routers.dockge.rule=Pathprefix(`/dockge`)"
+      - "traefik.http.routers.dockge.rule=Host(`dockge.thinkpad.teda.id.au`)"
       - "traefik.http.services.dockge.loadbalancer.server.port=5001"
       - "com.centurylinklabs.watchtower.enable=true"
 
 networks:
-  default:
+  traefik_proxy:
     name: traefik_proxy
     external: true
+
