@@ -12,6 +12,7 @@ services:
   mongodb:
     image: mongo:4.4 ## Linuxserver recommends pinning to 4.4
     container_name: unifi_mongodb
+    user: ${PUID}:${PGID}
     environment:
       - MONGO_USER=${MONGO_USER:- unifi_application}
       - MONGO_PASS=${MONGO_PASS:- unifi_application}
