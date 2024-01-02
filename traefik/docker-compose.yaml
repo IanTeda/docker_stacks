@@ -1,10 +1,9 @@
----
-version: '3'
+###############################################################################
+# TRAEFIX 
+# Reverse proxy
 
-networks:
-  default:
-    name: "traefik_network"
-    driver: bridge
+---
+version: '3.8'
 
 services:
   traefik:
@@ -24,26 +23,22 @@ services:
       # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       ## Docker Config
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=traefik_network"
+      # - "--providers.docker.exposedbydefault=false"
+      # - "--providers.docker.network=traefik_proxy"
       ## Misc Configuration
       - '--global.sendanonymoususage=false'
+      ## [source]:[destination] 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
+    ## [host]:[container]
     ports:
-      - "80:80"
-      - "443:443"
-      # - "8088:8080" # Access dashboard
+      - "80:80" # http entry point port
+      - "443:443" # https entry point port
+      # - "8088:8080" # Web GUI (dashboard) port
 
-  ## Service to test traefik
-  # whoami:
-  #   image: traefik/whoami
-  #   container_name: traefik_whoami
-  #   depends_on:
-  #     - traefik
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.whoami.rule=Pathprefix(`/whoami`)
-  #     - traefik.http.services.whoami.loadbalancer.server.port=80
+networks:
+  default:
+    name: traefik_proxy
+    driver: bridge

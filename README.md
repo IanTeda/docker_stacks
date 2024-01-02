@@ -1,2 +1,3 @@
-# portainer-stacks
-Collection of Portainer Stacks (Docker Compose) for my home NAS
+# Docker Stacks 
+
+A collection of Docker Compose files for my home lab
