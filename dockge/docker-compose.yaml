@@ -9,8 +9,6 @@ services:
     image: louislam/dockge:${DOCKGE_VERSION:-latest}
     container_name: dockge
     restart: unless-stopped
-    networks:
-      - traefik_proxy
     ports:
       - "5001:5001"
     volumes:
@@ -18,15 +16,10 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${STACKS_PATH:-/opt/docker_stacks}:/opt/stacks"
-      - "${DOCKGE_PATH:-~/Docker/dockge/}/data:/app/data"
+      - "${DOCKGE_PATH:-~/Docker/dockge}/data:/app/data"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dockge.rule=Pathprefix(`/dockge`)"
       - "traefik.http.services.dockge.loadbalancer.server.port=5001"
       - "com.centurylinklabs.watchtower.enable=true"
-
-networks:
-  traefik_proxy:
-    name: traefik_proxy
-    external: true
 
