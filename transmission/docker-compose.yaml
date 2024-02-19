@@ -19,6 +19,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
       - "${DOWNLOADS_PATH:-~/Downloads}:/data/downloads:z"
+      - "${DOWNLOADS_INCOMPLETE_PATH:-~/Downloads_Incomplet}:/data/downloads_incomplete:z"
       - "${TRANSMISSION_PATH:-~/Docker/transmission}:/data/transmission-home:Z"
     environment:
       - PUID=${PUID}
@@ -35,8 +36,7 @@ services:
       - TRANSMISSION_SCRAPE_PAUSED_TORRENTS_ENABLED=false
       - TRANSMISSION_HOME=/data/transmission-home
       - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
-      - TRANSMISSION_INCOMPLETE_DIR=/data/downloads/#incomplete
-      - TRANSMISSION_WATCH_DIR=/data/downloads/#watch
+      - TRANSMISSION_INCOMPLETE_DIR=/data/downloads_incomplete
       - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
       - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_RPC_USERNAME}
       - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_RPC_PASSWORD}
