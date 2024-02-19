@@ -16,7 +16,6 @@ services:
     container_name: transmission_openvpn
     restart: unless-stopped
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
       - "${DOWNLOADS_PATH:-~/Downloads}:/data/downloads:z"
       - "${DOWNLOADS_INCOMPLETE_PATH:-~/Downloads_Incomplet}:/data/downloads_incomplete:z"
