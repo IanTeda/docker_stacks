@@ -1,24 +1,27 @@
 ###############################################################################
-# SWAGGER EDITOR
-# https://github.com/swagger-api/swagger-editor
+# SWAGGER (OPENAPI)
 #
-# Swagger Editor lets you edit OpenAPI API definitions (OpenAPI 2.0 and 
-# OpenAPI 3.0.3) in JSON or YAML format inside your browser and to preview 
-# documentations in real time.
+# Simplify API development for users, teams, and enterprises with the Swagger 
+# open source and professional toolset. Find out how Swagger can help you design
+# and document your APIs at scale.
 ---
 version: "3.8"
-
 services:
+  # https://github.com/swagger-api/swagger-editor
   swagger-editor:
-    # https://hub.docker.com/r/swaggerapi/swagger-editor/
     image: swaggerapi/swagger-editor:${SWAGGER_EDITOR_VERSION:-latest}
-    container_name: swagger_editor
-    environment:
-      - SWAGGER_FILE=${SWAGGER_FILE:-/tmp/swagger.yaml}
-    volumes:
-      - ${SWAGGER_EDITOR_PATH:-~/Docker/swagger}:/tmp
-    ports:
-      - 8089:8080
+    container_name: "swagger_editor"
     restart: unless-stopped
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "8081:8080"
+  # https://github.com/swagger-api/swagger-ui
+  swagger-ui:
+    image: swaggerapi/swagger-ui:${SWAGGER_UI_VERSION:-latest}
+    container_name: "swagger_ui"
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    volumes:
+      - ${SWAGGER_FILE:-./openapi.yaml}:/swagger.yaml
+    environment:
+      SWAGGER_JSON: /swagger.yaml
