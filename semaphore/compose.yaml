@@ -1,0 +1,57 @@
+---
+networks:
+  # Defualt: this docker-compose network, to kep things tidy
+  default:
+    name: semaphore_network
+    driver: bridge
+
+# Semaphore
+# https://github.com/semaphoreui/semaphore/tree/develop?tab=readme-ov-file
+services:
+  postgres:
+    # https://hub.docker.com/_/postgres/
+    image: docker.io/library/postgres:${PG_VERSION:-17-alpine} 
+    container_name: semaphore_postgres
+    restart: unless-stopped
+    volumes:
+      - ${SEMAPHORE_PATH:-.}/postgres/:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: semaphore
+      POSTGRES_DB: semaphore
+    env_file:
+      - .env
+  
+  # redis:
+  #   image: docker.io/library/redis:alpine
+  #   volumes:
+  #     - redis:/data
+  
+  semaphore:
+    container_name: semaphore_ui
+    image: docker.io/semaphoreui/semaphore:${SEMAPHORE_VERSION:-latest}
+    user: "${UID}:${GID}"
+    ports:
+      - 3003:3000
+    environment:
+      - SEMAPHORE_DB_DIALECT=postgres
+      - SEMAPHORE_DB_HOST=postgres
+      - SEMAPHORE_DB_PORT=5432
+      - SEMAPHORE_DB_NAME=semaphore
+      - SEMAPHORE_DB_USER=semaphore
+      - SEMAPHORE_DB_PASS=${PG_PASS:?database password required}
+      - SEMAPHORE_PLAYBOOK_PATH=/tmp/semaphore/
+      - SEMAPHORE_ADMIN_NAME=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
+      - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD:?Semaphore admin password required}
+      - SEMAPHORE_ADMIN_EMAIL=${SEMAPHORE_ADMIN_EMAIL:?Semaphore admin password required}
+      - SEMAPHORE_ADMIN=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
+      - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEMAPHORE_ACCESS_KEY_ENCRYPTION:?Semaphore uneque key required}
+      - ANSIBLE_HOST_KEY_CHECKING=false  # (optional) change to true if you want to enable host key checking
+    volumes:
+      - ${SEMAPHORE_PATH:-.}/inventory/:/inventory:ro
+      - ${SEMAPHORE_PATH:-.}/authorized_keys/:/authorized-keys:ro
+      - ${SEMAPHORE_PATH:-.}/config/:/etc/semaphore:rw
+    restart: unless-stopped
+    depends_on:
+      - postgres
