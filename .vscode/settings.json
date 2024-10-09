@@ -16,6 +16,7 @@
         "PGID",
         "PUID",
         "Redash",
+        "semaphoreui",
         "SIGNUP",
         "timeseries",
         "UNIFI"
