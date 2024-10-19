@@ -3,8 +3,6 @@
 # With watchtower you can update the running version of your containerized app simply by pushing a new image to the Docker Hub or your own image registry.
 #
 # https://github.com/containrrr/watchtower
----
-version: "3.8"
 
 services:
   watchtower:
@@ -18,12 +16,9 @@ services:
       # https://containrrr.dev/watchtower/arguments/#scheduling
       - WATCHTOWER_SCHEDULE=${WATCHTOWER_SCHEDULE:-0 0 0 * * *} ## https://pkg.go.dev/github.com/robfig/cron@v1.2.0#hdr-CRON_Expression_Format
     volumes:
-      - "/etc/timezone:/etc/timezone:ro"
+      - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
-
-networks:
-  default:
-    name: traefik_proxy
-    external: true
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
