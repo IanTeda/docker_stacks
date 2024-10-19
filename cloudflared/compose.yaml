@@ -1,8 +1,12 @@
----
-version: '3'
+# Cloudflare tunnel network container
 
+# To get access in other containers use
+# networks:
+#   cloudflare:
+#    external: true
 networks:
-  network:
+  default:
+    name: cloudflare
     driver: bridge
 
 services:
@@ -14,7 +18,5 @@ services:
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
     restart: unless-stopped
-    networks:
-      - network # Other contianers to connect to the tunnel through cloudflared_tunnel_network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"

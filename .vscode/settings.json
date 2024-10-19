@@ -13,13 +13,15 @@
         "MARIADB",
         "mealie",
         "nodeexporter",
+        "Ntfy",
         "PGID",
         "PUID",
         "Redash",
         "semaphoreui",
         "SIGNUP",
         "timeseries",
-        "UNIFI"
+        "UNIFI",
+        "Wazuh"
     ],
     "sqltools.connections": []
 }
