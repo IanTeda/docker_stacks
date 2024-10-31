@@ -13,7 +13,7 @@ services:
   cloudflared:
     # https://github.com/cloudflare/cloudflared/releases
     image: cloudflare/cloudflared:${CLOUDFLARED_VERSION:-latest}
-    container_name: cloudflared_tunnel
+    container_name: cloudflared
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
