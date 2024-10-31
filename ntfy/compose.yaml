@@ -16,6 +16,11 @@ services:
       - serve
     environment:
       - TZ=${NTFY_TZ:-UTC}
+      - NTFY_BASE_URL=https://${NTFY_DOMAIN:?FQDN is required}
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_BEHIND_PROXY=true
+      - NTFY_ATTACHMENT_CACHE_DIR=/var/cache/ntfy/attachments
+      - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh # Optional if you need push notifications on iOS
     # user: UID:GID # optional: replace with your own user/group or uid/gid
     volumes:
       - ${NTFY_PATH:-.}/cache:/var/cache/ntfy

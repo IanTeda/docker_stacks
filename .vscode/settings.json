@@ -21,7 +21,8 @@
         "SIGNUP",
         "timeseries",
         "UNIFI",
-        "Wazuh"
+        "Wazuh",
+        "yourdomain"
     ],
     "sqltools.connections": []
 }
