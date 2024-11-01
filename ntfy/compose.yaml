@@ -1,7 +1,5 @@
----
 networks:
-  # Defualt: this docker-compose network, to keep things tidy
-  default:
+  default: # Give the default network a name, to use in other containers
     name: ntfy
     driver: bridge
   cloudflare:
@@ -16,11 +14,14 @@ services:
       - serve
     environment:
       - TZ=${NTFY_TZ:-UTC}
-      - NTFY_BASE_URL=https://${NTFY_DOMAIN:?FQDN is required}
+      - NTFY_BASE_URL=${NTFY_DOMAIN:?FQDN is required}
       - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
       - NTFY_BEHIND_PROXY=true
       - NTFY_ATTACHMENT_CACHE_DIR=/var/cache/ntfy/attachments
       - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh # Optional if you need push notifications on iOS
+      - NTFY_AUTH_FILE=/etc/ntfy/auth.db
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+      - NTFY_ENABLE_LOGIN=true
     # user: UID:GID # optional: replace with your own user/group or uid/gid
     volumes:
       - ${NTFY_PATH:-.}/cache:/var/cache/ntfy
