@@ -1,0 +1,39 @@
+# Uptime Kuma
+#
+# https://github.com/louislam/uptime-kuma
+
+networks:
+  cloudflare:
+    external: true
+  traefik:
+    external: true
+
+services:
+  uptime_kuma:
+    image: louislam/uptime-kuma:${KUMA_VERSION:-latest}
+    container_name: uptime_kuma
+    volumes:
+      - ${UPTIME_KUMA_PATH:-.}/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 13301:3001
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      ## Keep container image updated to latest version
+      - "com.centurylinklabs.watchtower.enable=true"
+
+      ## Configure Treafik proxy
+      - "traefik.enable=true"
+      # Uptime Kuma does not support domain paths
+      # - "traefik.http.routers.uptime_kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`) && Pathprefix(`/uptime`)"
+      # Hostname Cname needs to be added your local DNS (i.e. Pi Hole)
+      - "traefik.http.routers.uptime_kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`)"
+      - "traefik.http.routers.uptime_kuma.entrypoints=https"
+      - "traefik.http.routers.uptime_kuma.tls=true"
+      - "traefik.http.services.uptime_kuma.loadbalancer.server.port=3001"
+      - "traefik.docker.network=traefik"
+    networks: 
+      - traefik
+      - cloudflare
