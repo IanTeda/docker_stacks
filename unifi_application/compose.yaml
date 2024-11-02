@@ -1,0 +1,86 @@
+# UNIFI CONSOLE APPLICATION
+
+networks:
+  default:
+    name: unifi
+    driver: bridge
+  cloudflare:
+    external: true
+  traefik:
+    external: true
+
+services:
+  mongodb:
+    # Pin the MongoDB image version (do not use latest), as mongodb does not 
+    # support automatic upgrades between major versions.
+    image: docker.io/mongo:7
+    container_name: unifi_mongodb
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-password}
+      - MONGO_USER=${MONGO_USER:-unifi}
+      - MONGO_PASS=${MONGO_PASS:-password}
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi}
+      - MONGO_AUTHSOURCE=${MONGO_AUTHSOURCE:-admin}
+    volumes:
+      - ${UNIFI_PATH:-.}/mongodb:/data/db
+      - ./init_mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+    labels:
+      ## Keep container image updated to latest version
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  unifi:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - default
+      - traefik
+      - cloudflare
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Etc/UTC}
+      - MONGO_USER=${MONGO_USER:-unifi}
+      - MONGO_PASS=${MONGO_PASS:-password}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=${MONGO_DBNAME:-unifi}
+      - MONGO_AUTHSOURCE=${MONGO_AUTHSOURCE:-admin}
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+    volumes:
+      - ${UNIFI_PATH:-.}/unifi:/config
+    ports:
+      - 8443:8443         ## HTTPS GUI https://localhost:8443
+      - 3478:3478/udp     ## Unifi STUN port
+      - 10001:10001/udp   ## AP discovery
+      - 8080:8080         ## Required for device communication, do not change from 8080 as unifi devices expect this
+      # - 1900:1900/udp     ## Optional: Required for Make controller discoverable on L2 network option
+      - 8843:8843         ## Optional: Unifi guest portal HTTPS redirect port
+      - 8880:8880         ## Optional: Unifi guest portal HTTP redirect port
+      - 6789:6789         ## Optional: For mobile throughput test
+      - 5514:5514/udp     ## Optional: Remote syslog port
+    labels:
+      ## Keep container image updated to latest version
+      - "com.centurylinklabs.watchtower.enable=true"
+      
+      ## Configure Treafik proxy
+      - "traefik.enable=true"
+      # Alot of apps do not support domain paths
+      # - "traefik.http.routers.unifi.rule=Host(`${UNIFI_HOSTNAME}`) && Pathprefix(`/unifi`)"
+      # Host CNAME needs to be added your local DNS (i.e. Pi Hole)
+      # - "traefik.http.routers.unifi.rule=Host(`unifi.${UNIFI_HOSTNAME}`)"
+      - "traefik.http.routers.unifi.rule=Pathprefix(`/unifi`)"
+      - "traefik.http.routers.unifi.entrypoints=https"
+      - "traefik.http.routers.unifi.tls=true"
+      - "traefik.http.services.unifi.loadbalancer.server.port=8443"
+      - "traefik.docker.network=traefik"
