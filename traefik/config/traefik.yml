@@ -1,0 +1,63 @@
+## -- ./config/traefik.yml
+
+# Set the log level 
+# log: 
+#   level: DEBUG 
+
+# Enable the dashboard with useful information 
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+# Providers feed into Traefik
+providers:
+  # Set up the docker provider  
+  docker:
+    # Use the Docker socket as the end point
+    endpoint: "unix:///var/run/docker.sock"
+    
+    # Turn off "auto-scraping" of containers by traffic otherwise it will try to 
+    # proxy all containers 
+    exposedByDefault: false
+  
+  # Set up external providers in the config.yml file
+  # file:
+  #   filename: /config.yml
+
+# Entry points (ports) that will access to Traefik
+entryPoints:
+  # The name of the entry point for regular http traffic, usually called http or web, 
+  # but you can call it anything
+  http:
+    address: ":80"
+    http:
+      # Set up a redirect for all requests to the https entry point 
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+  # The name of the entry point for https traffic, usually called https or websecure, 
+  # but you can call it anything
+  https:
+    address: ":443"
+
+# Don't check self signed certificates used within Traefik network
+serversTransport:
+  insecureSkipVerify: true # Other services using self signed certs
+
+# SSL certificate resolvers: this is used to get certificates for domains.
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: ian@teda.id.au # updated if required
+      storage: acme.json
+      caServer: https://acme-v02.api.letsencrypt.org/directory # prod (default)
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging
+      dnsChallenge:
+        provider: cloudflare
+        #disablePropagationCheck: true # uncomment this if you have issues pulling certificates through cloudflare, By setting this flag to true disables the need to wait for the propagation of the TXT record to all authoritative name servers.
+        #delayBeforeCheck: 60s # uncomment along with disablePropagationCheck if needed to ensure the TXT record is ready before verification is attempted 
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
