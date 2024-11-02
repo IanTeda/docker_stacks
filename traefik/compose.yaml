@@ -37,10 +37,10 @@ services:
       - ${TRAEFIK_PATH:-.}/config/acme.json:/acme.json # I need to chmod 600
       # - ${TRAEFIK_PATH:-.}/config/config.yml:/config.yml:ro
     labels:
-      ### Keep container image updated to latest version
+      ## Keep container image updated to latest version
       - "com.centurylinklabs.watchtower.enable=true"
       
-      ### Traefik dashboard configuration
+      ## Traefik dashboard proxy configuration
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`traefik.${HOSTNAME}.${DOMAIN}`)"
@@ -52,7 +52,7 @@ services:
       - "traefik.http.routers.traefik-secure.rule=Host(`traefik.${HOSTNAME}.${DOMAIN}`)"
       - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
       
-      ### Lets Encrypt certificate configuration
+      ## Lets Encrypt certificate configuration
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
@@ -68,12 +68,14 @@ services:
   #     - 8081:80
   #   labels: 
   #     - "traefik.enable=true"
+  #     # Host Cname needs to be added your local DNS (i.e. Pi Hole)
   #     - "traefik.http.routers.whoami_sub.rule=Host(`whoami.${HOSTNAME}.${DOMAIN}`)"
   #     - "traefik.http.routers.whoami_sub.entrypoints=https"
   #     - "traefik.http.routers.whoami_sub.tls=true"
   #     - "traefik.http.services.whoami_sub.loadbalancer.server.port=80"
+  #     - "traefik.docker.network=traefik"
   #   networks: 
-  #     - default
+  #     - traefik
     
   #     # Test and example for using Traefik
   # whoami_path: 
@@ -88,5 +90,6 @@ services:
   #     - "traefik.http.routers.whoami_path.entrypoints=https"
   #     - "traefik.http.routers.whoami_path.tls=true"
   #     - "traefik.http.services.whoami_path.loadbalancer.server.port=80"
+  #     - "traefik.docker.network=traefik"
   #   networks: 
-  #     - default
+  #     - traefik
