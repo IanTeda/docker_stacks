@@ -1,0 +1,68 @@
+networks:
+  default:
+    name: grafana
+    driver: bridge
+  cloudflare:
+    external: true
+  traefik:
+    external: true
+
+services:
+  postgres:
+    image: postgres:${POSTGRESQL_VERSION:-latest}
+    container_name: grafana_postgres
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-grafana}
+      - POSTGRES_USER=${POSTGRES_USER:-grafana}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+    volumes:
+      - ${GF_PATH:-.}/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d grafana -U grafana"]
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+  
+  # https://github.com/grafana/grafana
+  grafana:
+    image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
+    container_name: grafana
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+      - traefik
+      - cloudflare
+    # user: "${PUID}"
+    environment:
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=grafana_postgres
+      - GF_DATABASE_NAME=${POSTGRES_DB:-grafana}
+      - GF_DATABASE_USER=${POSTGRES_USER:-grafana}
+      - GF_DATABASE_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-password}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://${GF_HOSTNAME}/${GF_URL_PATH}
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      # - GF_INSTALL_PLUGINS="grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel"
+    # ports:
+    #   - "3033:3000"
+    volumes:
+      - ${GF_PATH:-.}/data:/var/lib/grafana
+      - ${GF_PATH:-.}/provisioning:/etc/grafana/provisioning
+    labels:
+      ## Watch for container image updates
+      - "com.centurylinklabs.watchtower.enable=true"
+
+      ## Configure Treafik proxy
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.entrypoints=https"
+      - "traefik.http.routers.grafana.rule=Host(`${GF_HOSTNAME}`) && PathPrefix(`/${GF_URL_PATH}/`)"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik"
