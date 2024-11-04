@@ -2,7 +2,7 @@
 networks:
   # Defualt: this docker-compose network, to kep things tidy
   default:
-    name: semaphore_network
+    name: semaphore
     driver: bridge
 
 # Semaphore
