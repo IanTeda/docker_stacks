@@ -28,16 +28,16 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
-      # - "--web.external-url=/${PROMETHEUS_URL_PATH}/" # Domain path is messing up metrics config
+      - "--web.external-url=/${PROMETHEUS_URL_PATH}/" # Domain path is messing up metrics config
     labels:
       ## Watch for container image updates
       - "com.centurylinklabs.watchtower.enable=true"
 
       ## Configure Treafik proxy
       ## https://blog.cubieserver.de/2020/configure-prometheus-on-a-sub-path-behind-reverse-proxy/
-      # - "traefik.enable=true"
-      # - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOSTNAME}`) && PathPrefix(`/${PROMETHEUS_URL_PATH}/`)"
-      # - "traefik.http.routers.prometheus.entrypoints=https"
-      # - "traefik.http.routers.prometheus.tls=true"
-      # - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-      # - "traefik.docker.network=traefik"
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_HOSTNAME}`) && PathPrefix(`/${PROMETHEUS_URL_PATH}/`)"
+      - "traefik.http.routers.prometheus.entrypoints=https"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.docker.network=traefik"
