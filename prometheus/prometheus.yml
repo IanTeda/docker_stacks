@@ -2,34 +2,6 @@
 #
 # https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 
-
-# Alertmanager configuration
-# alerting:
-#   alertmanagers:
-#   - scheme: http
-#     static_configs:
-#     - targets: 
-#       # - 'alertmanager:9093'
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
-# scrape_configs:
-#   # Monitor prometheus (itself)
-#   - job_name: 'prometheus'
-#     static_configs:
-#     - targets: ['127.0.0.1:9090']
-      
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  # - job_name: 'nodeexporter'
-  #   scrape_interval: 5s
-  #   static_configs:
-  #     - targets: ['monitoring_node_exporter:9100']
-
-  # - job_name: 'cadvisor'
-  #   scrape_interval: 5s
-  #   static_configs:
-  #     - targets: ['monitoring_cadvisor:8080']
-
 global:
   # How frequently to scrape targets by default.
   # [ scrape_interval: <duration> | default = 1m ]
@@ -121,12 +93,32 @@ rule_files:
 
 # Scrape config files specifies a list of globs. Scrape configs are read from
 # all matching files and appended to the list of scrape configs.
+# scrape_config_files:
+#   # [ - <filepath_glob> ... ]
 scrape_config_files:
-  # [ - <filepath_glob> ... ]
+  - /etc/prometheus/*.yaml
 
-# A list of scrape configurations.
-scrape_configs:
+# A list of Prometheus scraping jobs
+# Alternative import scrape files at `scrape_config_files:`
+# scrape_configs:
   # [ - <scrape_config> ... ]
+
+# scrape_configs:
+#   # Monitor prometheus (itself)
+#   - job_name: 'prometheus_main'
+#     static_configs:
+#     - targets: ['127.0.0.1:9090']
+      
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  # - job_name: 'nodeexporter'
+  #   scrape_interval: 5s
+  #   static_configs:
+  #     - targets: ['monitoring_node_exporter:9100']
+
+  # - job_name: 'cadvisor'
+  #   scrape_interval: 5s
+  #   static_configs:
+  #     - targets: ['monitoring_cadvisor:8080']
 
 # Alerting specifies settings related to the Alertmanager.
 alerting:
