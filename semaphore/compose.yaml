@@ -1,27 +1,32 @@
 ---
 networks:
-  # Defualt: this docker-compose network, to kep things tidy
   default:
     name: semaphore
     driver: bridge
+  cloudflare:
+    external: true
+  traefik:
+    external: true
 
 # Semaphore
 # https://github.com/semaphoreui/semaphore/tree/develop?tab=readme-ov-file
 services:
   postgres:
-    # https://hub.docker.com/_/postgres/
-    image: docker.io/library/postgres:${PG_VERSION:-17-alpine} 
+    image: postgres:${POSTGRESQL_VERSION:-latest}
     container_name: semaphore_postgres
     restart: unless-stopped
-    volumes:
-      - ${SEMAPHORE_PATH:-.}/postgres/:/var/lib/postgresql/data
-      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - default
     environment:
-      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
-      POSTGRES_USER: semaphore
-      POSTGRES_DB: semaphore
-    env_file:
-      - .env
+      - POSTGRES_DB=${POSTGRES_DB:-semaphore}
+      - POSTGRES_USER=${POSTGRES_USER:-semaphore}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-semaphore}
+    volumes:
+      - ${GF_PATH:-.}/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-semaphore} -d ${POSTGRES_DB:-semaphore}"]
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
   
   # redis:
   #   image: docker.io/library/redis:alpine
@@ -31,21 +36,26 @@ services:
   semaphore:
     container_name: semaphore_ui
     image: docker.io/semaphoreui/semaphore:${SEMAPHORE_VERSION:-latest}
-    user: "${UID}:${GID}"
+    # user: "${UID}:${GID}"
+    networks:
+      - default
+      - traefik
+      - cloudflare
     ports:
       - 3003:3000
     environment:
       - SEMAPHORE_DB_DIALECT=postgres
       - SEMAPHORE_DB_HOST=postgres
       - SEMAPHORE_DB_PORT=5432
-      - SEMAPHORE_DB_NAME=semaphore
-      - SEMAPHORE_DB_USER=semaphore
-      - SEMAPHORE_DB_PASS=${PG_PASS:?database password required}
-      - SEMAPHORE_PLAYBOOK_PATH=/tmp/semaphore/
+      - SEMAPHORE_DB_NAME=${POSTGRES_DB:-semaphore}
+      - SEMAPHORE_DB_USER=${POSTGRES_USER:-semaphore}
+      - SEMAPHORE_DB_PASS=${POSTGRES_PASSWORD:-semaphore}
+      - SEMAPHORE_PLAYBOOK_PATH=${PLAYBOOK_PATH:-./ansible_playbooks}
       - SEMAPHORE_ADMIN_NAME=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
       - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD:?Semaphore admin password required}
       - SEMAPHORE_ADMIN_EMAIL=${SEMAPHORE_ADMIN_EMAIL:?Semaphore admin password required}
       - SEMAPHORE_ADMIN=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
+      - SEMAPHORE_WEB_HOST=https://${SEMAPHORE_HOSTNAME}/${SEMAPHORE_URL_PATH}/
       - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEMAPHORE_ACCESS_KEY_ENCRYPTION:?Semaphore uneque key required}
       - ANSIBLE_HOST_KEY_CHECKING=false  # (optional) change to true if you want to enable host key checking
     volumes:
@@ -54,4 +64,17 @@ services:
       - ${SEMAPHORE_PATH:-.}/config/:/etc/semaphore:rw
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    labels:
+      ## Watch for container image updates
+      - "com.centurylinklabs.watchtower.enable=true"
+
+      ## Configure Treafik proxy
+      ## https://blog.cubieserver.de/2020/configure-prometheus-on-a-sub-path-behind-reverse-proxy/
+      - "traefik.enable=true"
+      - "traefik.http.routers.semaphore.rule=Host(`${SEMAPHORE_HOSTNAME}`) && PathPrefix(`/${SEMAPHORE_URL_PATH}/`)"
+      - "traefik.http.routers.semaphore.entrypoints=https"
+      - "traefik.http.routers.semaphore.tls=true"
+      - "traefik.http.services.semaphore.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik"

@@ -1,17 +1,36 @@
+# Internet Speedtest Prometheus Exporter
+
+networks:
+  prometheus:
+    external: true
 
 services:
-  internet_monitor:
-    # https://github.com/beykansen/internet-speed-monitor
-    image: ghcr.io/beykansen/internet-speed-monitor:${INTERNET_SPEED_MONITOR_VERSION:-latest}
-    container_name: monitoring_speedtest
-    environment:
-      - PORT=8083
-      - INTERVAL=15 # In minutes
-      - CALLBACK=${SPEEDTEST_CALLBACK}
-    ports:
-      - "8083:8083"
-    networks:
-      - default
+  # internet_monitor: # ! Not maintained
+  #   # https://github.com/beykansen/internet-speed-monitor
+  #   image: ghcr.io/beykansen/internet-speed-monitor:${INTERNET_SPEED_MONITOR_VERSION:-latest}
+  #   container_name: monitoring_speedtest
+  #   environment:
+  #     - PORT=8083
+  #     - INTERVAL=15 # In minutes
+  #     - CALLBACK=${SPEEDTEST_CALLBACK}
+  #   ports:
+  #     - "8083:8083"
+  #   networks:
+  #     - default
+  #   restart: unless-stopped
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=true"
+
+  # https://docs.miguelndecarvalho.pt/projects/speedtest-exporter/
+  internet_speedtest:
+    image: ghcr.io/miguelndecarvalho/speedtest-exporter${SPEEDTEST_VERSION:-}
+    container_name: internet_speedtest
     restart: unless-stopped
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - prometheus
+    # Exporter listenign on this port
+    # ports:
+    #   - 9798:9798
+    # environment:
+    #   - SPEEDTEST_PORT=<speedtest-port> #optional
+    #   - SPEEDTEST_SERVER=<server-id> #optional

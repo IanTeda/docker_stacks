@@ -30,6 +30,7 @@
         "reloadable",
         "semaphoreui",
         "SIGNUP",
+        "speedtest",
         "timeseries",
         "traefik",
         "tsdb",

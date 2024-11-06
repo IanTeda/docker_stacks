@@ -1,0 +1,9 @@
+# Scrape config for Prometheus
+# Rename to internet_speedtest.yaml and copy to prometheus config folder
+
+scrape_configs:
+  - job_name: "internet_speedtest"
+    scrape_interval: 1h
+    scrape_timeout: 1m
+    static_configs:
+      - targets: ["internet_speedtest.prometheus:9798"]
