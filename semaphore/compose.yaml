@@ -12,7 +12,7 @@ networks:
 # https://github.com/semaphoreui/semaphore/tree/develop?tab=readme-ov-file
 services:
   postgres:
-    image: postgres:${POSTGRESQL_VERSION:-latest}
+    image: postgres:${POSTGRES_VERSION:-latest}
     container_name: semaphore_postgres
     restart: unless-stopped
     networks:
@@ -22,7 +22,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-semaphore}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-semaphore}
     volumes:
-      - ${GF_PATH:-.}/postgres:/var/lib/postgresql/data
+      - ${SEMAPHORE_PATH:-.}/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-semaphore} -d ${POSTGRES_DB:-semaphore}"]
     labels:
@@ -50,12 +50,11 @@ services:
       - SEMAPHORE_DB_NAME=${POSTGRES_DB:-semaphore}
       - SEMAPHORE_DB_USER=${POSTGRES_USER:-semaphore}
       - SEMAPHORE_DB_PASS=${POSTGRES_PASSWORD:-semaphore}
-      - SEMAPHORE_PLAYBOOK_PATH=${PLAYBOOK_PATH:-./ansible_playbooks}
       - SEMAPHORE_ADMIN_NAME=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
       - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD:?Semaphore admin password required}
       - SEMAPHORE_ADMIN_EMAIL=${SEMAPHORE_ADMIN_EMAIL:?Semaphore admin password required}
       - SEMAPHORE_ADMIN=${SEMAPHORE_ADMIN_NAME:?Semaphore admin username required}
-      - SEMAPHORE_WEB_HOST=https://${SEMAPHORE_HOSTNAME}/${SEMAPHORE_URL_PATH}/
+      - SEMAPHORE_WEB_HOST=https://${SEMAPHORE_HOSTNAME}
       - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEMAPHORE_ACCESS_KEY_ENCRYPTION:?Semaphore uneque key required}
       - ANSIBLE_HOST_KEY_CHECKING=false  # (optional) change to true if you want to enable host key checking
     volumes:
@@ -71,10 +70,9 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
       ## Configure Treafik proxy
-      ## https://blog.cubieserver.de/2020/configure-prometheus-on-a-sub-path-behind-reverse-proxy/
-      - "traefik.enable=true"
-      - "traefik.http.routers.semaphore.rule=Host(`${SEMAPHORE_HOSTNAME}`) && PathPrefix(`/${SEMAPHORE_URL_PATH}/`)"
-      - "traefik.http.routers.semaphore.entrypoints=https"
-      - "traefik.http.routers.semaphore.tls=true"
-      - "traefik.http.services.semaphore.loadbalancer.server.port=3000"
-      - "traefik.docker.network=traefik"
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.semaphore.rule=Host(`${SEMAPHORE_HOSTNAME}`)"
+      # - "traefik.http.routers.semaphore.entrypoints=https"
+      # - "traefik.http.routers.semaphore.tls=true"
+      # - "traefik.http.services.semaphore.loadbalancer.server.port=3000"
+      # - "traefik.docker.network=traefik"
