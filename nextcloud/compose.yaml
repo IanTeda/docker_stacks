@@ -1,11 +1,8 @@
----
-version: '3'
-
 networks:
   default: # this docker-compose network
-    name: nextcloud_network
+    name: nextcloud
     driver: bridge
-  tunnel_network: # Cloudflare zero trust tunnel network
+  cloudflare: # Cloudflare zero trust tunnel network
     external: true
 
 services:
@@ -31,7 +28,7 @@ services:
       - redis
     networks:
       - default
-      - tunnel_network
+      - cloudflare
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     

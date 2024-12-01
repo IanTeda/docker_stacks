@@ -4,16 +4,16 @@
 #
 # https://github.com/containrrr/watchtower
 
-networks:
-  ntfy:
-    external: true
+# networks:
+#   ntfy:
+#     external: true
 
 services:
   watchtower:
     image: containrrr/watchtower:${WATCHTOWER_VERSION:-latest}
     container_name: watchtower
-    networks:
-      - ntfy
+    # networks:
+    #   - ntfy
     environment:
       # https://containrrr.dev/watchtower/arguments/#cleanup
       - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP:-false}
@@ -25,8 +25,8 @@ services:
       - WATCHTOWER_NOTIFICATION_SKIP_TITLE=True
       - WATCHTOWER_NOTIFICATION_URL=ntfy://:${NTFY_TOKEN:?Access token from ntfy server required}@${NTFY_FQDN:?Ntfy server domain name required}/${NTFY_TOPIC:?Ntfy subscription topic required}?title=${NTFY_TITLE:?Ntfy message topic is needed}
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     labels:
