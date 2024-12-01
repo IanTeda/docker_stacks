@@ -16,8 +16,8 @@ services:
     restart: unless-stopped
     # security_opt:
     #   - no-new-privileges:true
-    volumes:
-      - ${PAPERLESS_PATH:-./data}/redis:/data
+    # volumes:
+    #   - ${PAPERLESS_PATH:-./data}/redis:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -79,6 +79,8 @@ services:
       - ${PAPERLESS_PATH:-./data}/export:/usr/src/paperless/export
       - ${PAPERLESS_PATH:-./data}/consume:/usr/src/paperless/consume
     environment:
+      USERMAP_UID: ${PUID}
+      USERMAP_GID: ${PGID}
       PAPERLESS_ADMIN_MAIL: ${PAPERLESS_ADMIN_MAIL}
       PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER:-paperless}
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:-paperless}
