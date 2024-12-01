@@ -1,0 +1,100 @@
+# Docker Compose file for running paperless from the Docker Hub.
+# This file contains everything paperless needs to run in docker.
+
+networks:
+  default: # this docker-compose network
+    name: paperless
+    driver: bridge
+  cloudflare: # Cloudflare zero trust tunnel network
+    external: true
+
+services:
+  redis:
+    # https://hub.docker.com/_/redis?tab=tags
+    image: redis:${REDIS_VERSION:-latest}
+    container_name: paperless_redis
+    restart: unless-stopped
+    # security_opt:
+    #   - no-new-privileges:true
+    volumes:
+      - ${PAPERLESS_PATH:-./data}/redis:/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  postgres:
+    # https://hub.docker.com/_/postgres
+    image: postgres:${POSTGRESQL_VERSION:-latest}
+    container_name: paperless_postgres
+    restart: unless-stopped
+    networks:
+      - default
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-paperless}
+      - POSTGRES_USER=${POSTGRES_USER:-paperless}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-paperless}
+    volumes:
+      - ${PAPERLESS_PATH:-./data}/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB:-paperless} -U ${POSTGRES_USER:-paperless}"]
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+  
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:${GOTENBERG_VERSION:-latest}
+    container_name: paperless_gotenberg
+    restart: unless-stopped
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+  
+  tika:
+    image: docker.io/apache/tika:${TIKA_VERSION:-latest}
+    container_name: paperless_tika
+    restart: unless-stopped
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:${PAPERLESS_VERSION:-latest}
+    restart: unless-stopped
+    container_name: paperless_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      gotenberg:
+        condition: service_started
+      tika:
+        condition: service_started
+    networks:
+      - default
+      - cloudflare
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${PAPERLESS_PATH:-./data/paperless}/data:/usr/src/paperless/data
+      - ${PAPERLESS_PATH:-./data}/media:/usr/src/paperless/media
+      - ${PAPERLESS_PATH:-./data}/export:/usr/src/paperless/export
+      - ${PAPERLESS_PATH:-./data}/consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_ADMIN_MAIL: ${PAPERLESS_ADMIN_MAIL}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER:-paperless}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:-paperless}
+      PAPERLESS_APP_TITLE: ${PAPERLESS_TITLE:-Paperless}
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: postgres
+      PAPERLESS_DBNAME: ${POSTGRES_DB:-paperless}
+      PAPERLESS_DBPASS: ${POSTGRES_PASSWORD:-paperless}
+      PAPERLESS_DBPORT: 5432
+      PAPERLESS_DBUSER: ${POSTGRES_USER:-paperless}
+      PAPERLESS_REDIS: redis://redis:6379
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?Secret key is required}
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_URL: ${PAPERLESS_DOMAIN_NAME} # This value cannot contain a path (e.g. domain.com/path), even if you are installing paperless-ngx at a subpath.
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    
