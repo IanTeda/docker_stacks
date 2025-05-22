@@ -1,9 +1,22 @@
-# Cloudflare tunnel network container
-
-# To get access in other containers use
+# Cloudflare Tunnel Container Stack
+# --------------------------------
+#
+# This compose file sets up a Cloudflare Tunnel container that provides secure 
+# access to internal services without exposing ports to the internet.
+#
+# Required Environment Variables:
+# - CLOUDFLARED_TUNNEL_TOKEN: Your Cloudflare Tunnel token
+# - CLOUDFLARED_VERSION: Container version (optional, defaults to 'latest')
+#
+# Usage:
+# 1. Create a .env file with required variables
+# 2. Start the stack: docker compose up -d
+#
+# To connect other containers to this tunnel:
 # networks:
 #   cloudflare:
-#    external: true
+#     external: true
+
 networks:
   default:
     name: cloudflare
@@ -18,5 +31,16 @@ services:
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "cloudflared", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
