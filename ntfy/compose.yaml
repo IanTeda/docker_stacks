@@ -1,7 +1,26 @@
+---
+# Ntfy Notification Server Stack
+# -----------------------------
+#
+# Required Environment Variables:
+# - NTFY_HOSTNAME: FQDN for the server
+# - NTFY_VERSION: Container version (optional, defaults to 'latest')
+# - NTFY_TZ: Timezone (optional, defaults to UTC)
+# - NTFY_PATH: Data directory path (optional, defaults to './') 
+# - NTFY_PORT: Host port (optional, defaults to 8091)
+#
+# Usage:
+# 1. Create a .env file with required variables
+# 2. Start the stack: docker compose up -d
+# 3. Access the server at http://<your-server-ip>:<NTFY_PORT>
+# 4. For HTTPS, set up a Cloudflare Tunnel or use a reverse proxy
+# 5. To connect other containers to this ntfy server:
+#    networks:
+#      cloudflare:
+#        external: true
+
 networks:
   cloudflare:
-    external: true
-  traefik:
     external: true
 
 services:
@@ -34,20 +53,15 @@ services:
         retries: 3
         start_period: 40s
     restart: unless-stopped
+    # Add memory and CPU limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
     labels:
       ## Keep container image updated to latest version
       - "com.centurylinklabs.watchtower.enable=true"
-      
-      ## Configure Treafik proxy
-      - "traefik.enable=true"
-      # Ntfy does not support domain paths
-      # - "traefik.http.routers.ntfy.rule=Host(`${NTFY_HOSTNAME}`) && Pathprefix(`/ntfy`)"
-      # Host Cname needs to be added your local DNS (i.e. Pi Hole)
-      - "traefik.http.routers.ntfy.rule=Host(`ntfy.${NTFY_HOSTNAME}`)"
-      - "traefik.http.routers.ntfy.entrypoints=https"
-      - "traefik.http.routers.ntfy.tls=true"
-      - "traefik.http.services.ntfy.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik"
     networks: 
-      - traefik
       - cloudflare
