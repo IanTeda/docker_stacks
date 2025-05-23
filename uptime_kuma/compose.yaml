@@ -1,11 +1,25 @@
-# Uptime Kuma
+---
+# Uptime Kuma Monitoring Stack
+# ---------------------------
+#
+# This compose file sets up Uptime Kuma, a self-hosted status monitoring solution.
+# It includes a web interface for monitoring the status of your services.
+# Uptime Kuma supports multiple protocols including HTTP(s), TCP, ICMP ping, and more.
+# It also provides notification support for various services like Slack, Discord, and email.
 #
 # https://github.com/louislam/uptime-kuma
+#
+# Required Environment Variables:
+# - KUMA_VERSION: Container version (optional, defaults to 'latest')
+# - UPTIME_KUMA_PATH: Data directory path (optional, defaults to './')
+#
+# Usage:
+# 1. Create a .env file with required variables
+# 2. Start the stack: docker compose up -d
+# 3. Access the UI at http://<your-server>:13301
 
 networks:
   cloudflare:
-    external: true
-  traefik:
     external: true
 
 services:
@@ -20,20 +34,25 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+          limits:
+            memory: 256M
+          reservations:
+            memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       ## Keep container image updated to latest version
       - "com.centurylinklabs.watchtower.enable=true"
-
-      ## Configure Treafik proxy
-      - "traefik.enable=true"
-      # Uptime Kuma does not support domain paths
-      # - "traefik.http.routers.uptime_kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`) && Pathprefix(`/uptime`)"
-      # Hostname Cname needs to be added your local DNS (i.e. Pi Hole)
-      - "traefik.http.routers.uptime_kuma.rule=Host(`${UPTIME_KUMA_HOSTNAME}`)"
-      - "traefik.http.routers.uptime_kuma.entrypoints=https"
-      - "traefik.http.routers.uptime_kuma.tls=true"
-      - "traefik.http.services.uptime_kuma.loadbalancer.server.port=3001"
-      - "traefik.docker.network=traefik"
     networks: 
-      - traefik
       - cloudflare
