@@ -1,19 +1,25 @@
-###############################################################################
-# WATCH TOWER
-# With watchtower you can update the running version of your containerized app simply by pushing a new image to the Docker Hub or your own image registry.
+---
+# Watchtower Container Update Stack
+# --------------------------------
 #
-# https://github.com/containrrr/watchtower
-
-# networks:
-#   ntfy:
-#     external: true
+# Automatically updates running Docker containers when new images are available.
+#
+# Required Environment Variables:
+# - NTFY_TOKEN: Access token for ntfy notifications
+# - NTFY_FQDN: Domain name of ntfy server
+# - NTFY_TOPIC: Topic for notifications
+# - NTFY_TITLE: Title for notifications
+#
+# Optional Environment Variables:
+# - WATCHTOWER_VERSION: Container version (defaults to 'latest')
+# - WATCHTOWER_CLEANUP: Remove old images (defaults to false)
+# - WATCHTOWER_LABEL_ENABLE: Only update containers with label (defaults to false)
+# - WATCHTOWER_SCHEDULE: Update schedule in cron format (defaults to daily at midnight)
 
 services:
   watchtower:
     image: containrrr/watchtower:${WATCHTOWER_VERSION:-latest}
     container_name: watchtower
-    # networks:
-    #   - ntfy
     environment:
       # https://containrrr.dev/watchtower/arguments/#cleanup
       - WATCHTOWER_CLEANUP=${WATCHTOWER_CLEANUP:-false}
@@ -28,6 +34,24 @@ services:
       # - /etc/timezone:/etc/timezone:ro
       # - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "ps aux | grep [w]atchtower"]
+      interval: 300s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
