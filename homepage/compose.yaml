@@ -1,0 +1,45 @@
+---
+#-- ./homepage/compose.yaml
+
+# -----------------------------------------------------------------------------
+# Homepage Docker Compose File
+# 
+# This file defines the Homepage dashboard service and its dependencies.
+# 
+# Usage:
+#   - Configure environment variables in a .env file (see below for required vars).
+#   - Ensure the config directory exists on the host and is writable.
+#   - Optionally mount the Docker socket for container integration.
+#
+# Required Environment Variables:
+#   HOMEPAGE_VERSION   - The version tag for the Homepage image (e.g., v0.8.11)
+#   HOMEPAGE_HOST      - Comma-separated list of allowed hosts (e.g., localhost,192.168.1.100)
+#   HOMEPAGE_PORT      - Port to expose the Homepage UI (default: 3000)
+#   HOMEPAGE_PATH      - Path to the Homepage config directory on the host
+#
+# Optional:
+#   PUID, PGID         - Set user/group IDs for file permissions
+#
+# Docs: https://gethomepage.dev/en/
+# -----------------------------------------------------------------------------
+
+networks:
+  default:
+    name: homepage_network # Use a custom network name if needed
+    external: false # Set to true if you want to use an existing network
+    driver: bridge
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_VERSION:-latest}
+    container_name: homepage
+    restart: unless-stopped
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_HOST} # required, set your homepage host server
+      # PUID: 1000 # optional, your user id
+      # PGID: 1000 # optional, your group id
+    ports:
+      - ${HOMEPAGE_PORT:-3000}:3000
+    volumes:
+      - ${HOMEPAGE_PATH}/config:/app/config # Make sure your local config directory exists
+      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
