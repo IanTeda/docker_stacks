@@ -1,4 +1,15 @@
-# UNIFI CONSOLE APPLICATION
+---
+# UniFi Network Application Stack
+# ------------------------------
+#
+# Required Environment Variables:
+# - UNIFI_PATH: Data directory path (optional, defaults to './')
+# - MONGO_USER: MongoDB username (optional, defaults to 'unifi')
+# - MONGO_PASS: MongoDB password (optional, defaults to 'password')
+# - MONGO_DBNAME: Database name (optional, defaults to 'unifi')
+# - PUID: User ID (optional, defaults to 1000)
+# - PGID: Group ID (optional, defaults to 1000)
+# - TZ: Timezone (optional, defaults to UTC)
 
 networks:
   default:
@@ -6,14 +17,10 @@ networks:
     driver: bridge
   cloudflare:
     external: true
-  traefik:
-    external: true
 
 services:
   mongodb:
-    # Pin the MongoDB image version (do not use latest), as mongodb does not 
-    # support automatic upgrades between major versions.
-    image: docker.io/mongo:7
+    image: docker.io/mongo:8
     container_name: unifi_mongodb
     restart: unless-stopped
     networks:
@@ -30,6 +37,16 @@ services:
       - ./init_mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
     labels:
       ## Keep container image updated to latest version
       - "com.centurylinklabs.watchtower.enable=true"
@@ -43,7 +60,6 @@ services:
         condition: service_healthy
     networks:
       - default
-      - traefik
       - cloudflare
     environment:
       - PUID=${PUID:-1000}
@@ -69,18 +85,19 @@ services:
       - 8880:8880         ## Optional: Unifi guest portal HTTP redirect port
       - 6789:6789         ## Optional: For mobile throughput test
       - 5514:5514/udp     ## Optional: Remote syslog port
+    healthcheck:
+      test: curl -k -f https://localhost:8443 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 512M
     labels:
       ## Keep container image updated to latest version
       - "com.centurylinklabs.watchtower.enable=true"
-      
-      ## Configure Treafik proxy
-      - "traefik.enable=true"
-      # Alot of apps do not support domain paths
-      # - "traefik.http.routers.unifi.rule=Host(`${UNIFI_HOSTNAME}`) && Pathprefix(`/unifi`)"
-      # Host CNAME needs to be added your local DNS (i.e. Pi Hole)
-      # - "traefik.http.routers.unifi.rule=Host(`unifi.${UNIFI_HOSTNAME}`)"
-      - "traefik.http.routers.unifi.rule=Pathprefix(`/unifi`)"
-      - "traefik.http.routers.unifi.entrypoints=https"
-      - "traefik.http.routers.unifi.tls=true"
-      - "traefik.http.services.unifi.loadbalancer.server.port=8443"
-      - "traefik.docker.network=traefik"
+

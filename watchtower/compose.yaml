@@ -42,7 +42,7 @@ services:
           memory: 64M
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "sh", "-c", "ps aux | grep [w]atchtower"]
+      test: ["CMD", "pgrep", "watchtower"]
       interval: 300s
       timeout: 10s
       retries: 3
